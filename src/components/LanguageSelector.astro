@@ -8,15 +8,17 @@ const { lang } = Astro.props;
 ---
 <div class="lang-switcher">
     <a href={`/en${pathWithoutLang}`} class={lang === "en" ? "active" : ""}>
-    EN
+    {lang === "en" ? "English" : "Angol"}
     </a>
     <a href={`/hu${pathWithoutLang}`} class={lang === "hu" ? "active" : ""}>
-        HU
+        {lang === "hu" ? "Magyar" : "Hungarian"}
     </a>
 </div>
 <style>
     .lang-switcher {
-        display: inline-block;
+        width: 10rem;
+        display: inline-flex;
+        justify-content: center;
         gap: 0.5rem;
         border: 1px solid var(--soft-white);
         padding: 0.25rem 0.5rem;
@@ -30,5 +32,12 @@ const { lang } = Astro.props;
 
     .lang-switcher a.active {
         font-weight: bold;
+    }
+
+    @media (max-width: 800px) {
+        .lang-switcher {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
     }
 </style>

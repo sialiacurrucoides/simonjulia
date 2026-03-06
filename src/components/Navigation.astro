@@ -9,13 +9,14 @@ const t = getLang(lang);
     <div id="logo">
         <a href=`/${lang}`><img src="./simon.png" width="26px" height="40px" alt="Simon logo"></a>
     </div>
+    <div><label for="hamburger-icon" class="hamburger"><i class="mobileMenuIcon fa fa-bars"></i></label></div>
+    <input type="checkbox" id="hamburger-icon">
     <div class="nav-links">
         <a href=`/${lang}/#blog`>{t.nav.blog}</a>
         <a href=`/${lang}/#about`>{t.nav.about}</a>
         <a href="#projects">{t.nav.projects}</a>
         <LanguageSelector lang={lang} />
     </div>
-    <!-- <label for="hamburger-icon" class="hamburger"><i class="mobileMenuIcon fa fa-bars"></i></label> -->
 </nav>
 
 <style>
@@ -24,6 +25,7 @@ const t = getLang(lang);
         background-image: linear-gradient(to left, var(--darkest-blue), var(--main-bg-color));
         display: flex;
         justify-content: space-between;
+        align-items: center;
         padding-right: 2rem;
         width: 100%;
         z-index: 20;
@@ -35,8 +37,16 @@ const t = getLang(lang);
     }
 
     .nav-links a {
-        display: inline-block;
+        display: inline-flex;
+        justify-content: center;
         padding: 1rem;
+    }
+
+    nav .nav-links a:hover {
+        transform: scale(1.1);
+        background-color: var(--main-bg-color-light);
+        border-radius: 4px;
+        color: white;
     }
 
     #logo {
@@ -53,4 +63,83 @@ const t = getLang(lang);
         margin: 0.5rem 0 0 0.5rem;
         align-self: center;
     }
+
+    #hamburger-icon {
+	display: none;
+}
+
+.hamburger {
+	position: absolute;
+	right: 2rem;
+	top: 1rem;
+	width: 3rem;
+	text-align: center;
+}
+
+.hamburger i {
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 1.8rem;
+	cursor: pointer;
+}
+
+@media screen and (min-width: 800px) {
+	.hamburger {
+		display: none;
+	}
+}
+
+@media (max-width: 800px) {
+	nav {
+		padding-right: 0;
+		opacity: 0.95;
+		border-bottom: 1px solid rgba(255, 255, 255, .6);
+	}
+	nav .nav-links {
+		display: none;
+		margin: auto;
+		transform: translateX(-3rem);
+	}
+	nav .nav-links a {
+		display: block;
+		padding: 0.9rem 1rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	}
+	nav .nav-links a:last-of-type {
+		border-bottom: none;
+	}
+
+	#hamburger-icon:checked + .nav-links {
+		display: block;
+		margin-top: 3rem;
+		animation: unfold 0.6s ease-out;
+	}
+
+	@keyframes unfold {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+}
 </style>
+
+<script>
+    window.onload = () => {
+
+    document.querySelector('.mobileMenuIcon')?.addEventListener('click', (ev) => {
+        const mobileMenuIcon = ev.target  as HTMLInputElement;
+
+        if (!mobileMenuIcon) return;
+
+        if (!mobileMenuIcon.classList.contains('fa-close')) {
+            mobileMenuIcon.classList.remove('fa-bars');
+            mobileMenuIcon.classList.add('fa-close');
+        } else {
+            mobileMenuIcon.classList.remove('fa-close');
+            mobileMenuIcon.classList.add('fa-bars');
+        }
+    });
+}
+</script>
