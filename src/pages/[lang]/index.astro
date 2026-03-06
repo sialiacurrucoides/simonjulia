@@ -1,0 +1,16 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: "en" } },
+    { params: { lang: "hu" } }
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout lang={lang}>
+  <h1>{lang === "hu" ? "Kezdőlap" : "Home"}</h1>
+</Layout>

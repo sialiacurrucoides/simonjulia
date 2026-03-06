@@ -1,0 +1,56 @@
+---
+import { getLang } from "../i18n";
+import LanguageSelector from "./LanguageSelector.astro";
+
+const { lang = "en" } = Astro.props;
+const t = getLang(lang);
+---
+<nav class="nav">
+    <div id="logo">
+        <a href=`/${lang}`><img src="./simon.png" width="26px" height="40px" alt="Simon logo"></a>
+    </div>
+    <div class="nav-links">
+        <a href=`/${lang}/#blog`>{t.nav.blog}</a>
+        <a href=`/${lang}/#about`>{t.nav.about}</a>
+        <a href="#projects">{t.nav.projects}</a>
+        <LanguageSelector lang={lang} />
+    </div>
+    <!-- <label for="hamburger-icon" class="hamburger"><i class="mobileMenuIcon fa fa-bars"></i></label> -->
+</nav>
+
+<style>
+    .nav {
+        background-color: var(--main-bg-color);
+        background-image: linear-gradient(to left, var(--darkest-blue), var(--main-bg-color));
+        display: flex;
+        justify-content: space-between;
+        padding-right: 2rem;
+        width: 100%;
+        z-index: 20;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: var(--soft-white);
+    }
+
+    .nav-links a {
+        display: inline-block;
+        padding: 1rem;
+    }
+
+    #logo {
+        height: 3rem;
+        width: 3rem;
+        margin: 1rem 2rem;
+        border-radius: 50%;
+        background: #ccc;
+        position: relative;
+    }
+
+    #logo img {
+        height: 2.5rem;
+        margin: 0.5rem 0 0 0.5rem;
+        align-self: center;
+    }
+</style>

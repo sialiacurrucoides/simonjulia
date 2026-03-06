@@ -1,0 +1,23 @@
+---
+import { getLang } from "../i18n";
+
+const { lang = "en" } = Astro.props;
+const t = getLang(lang);
+---
+<footer>
+    <p class="copyright">{t.footer.copyright}</p>
+</footer>
+
+<style>
+    footer {
+        padding-bottom: 1.5rem;
+        color: var(--soft-white);
+        background-color: var(--main-bg-color);
+        margin-top: auto;
+    }
+
+    .copyright {
+        text-align: center;
+        padding: 1rem;
+    }
+</style>

@@ -1,0 +1,18 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.8rem;
+}
+
+:root {
+  --main-bg-color: #233963;
+  --main-bg-color-light: #425883;
+  --main-height: 100vh;
+  --left-margin: 20%;
+  --soft-white: #ccc;
+  --border-radius: 0.3rem;
+  --darkest-blue: rgb(10, 10, 19);
+}
+
