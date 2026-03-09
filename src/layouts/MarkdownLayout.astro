@@ -2,15 +2,21 @@
 import TagList from '../components/TagList.astro';
 
 const { frontmatter } = Astro.props;
+
+const { lang } = Astro.params;
+
+const date = frontmatter.date instanceof Date ? frontmatter.date : new Date(frontmatter.date);
+
+const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 <div class="markdown-layout">
     <h1>{frontmatter.title}</h1>
-    <p>{frontmatter.date.toString().slice(0,10)}</p>
-    <p><em>{frontmatter.description}</em></p>
+    <p class="date-of-creation">{formattedDate}</p>
+    <p class="description"><em>{frontmatter.description}</em></p>
 
-    <TagList tags={frontmatter.tags} />
+    <TagList tags={frontmatter.tags}/>
 
-    <article>
+    <article class="content">
         <slot />
     </article>
 </div>
@@ -20,5 +26,21 @@ const { frontmatter } = Astro.props;
     max-width: 700px;
     margin: 0 auto;
     padding: 2em;
+  }
+
+  .date-of-creation {
+    font-style: italic;
+    color: var(--main-bg-color);
+    margin-bottom: 0.5em;
+  }
+
+  .description {
+    margin-bottom: 1rem;
+    color: var(--main-bg-color);
+  }
+
+  .content {
+    display: inline-block;
+    margin: 1rem auto;
   }
 </style>

@@ -17,3 +17,7 @@
   --darkest-blue: rgb(10, 10, 19);
 }
 
+strong {
+  font-weight: 700;
+}
+
