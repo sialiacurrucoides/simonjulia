@@ -7,16 +7,16 @@ const pathWithoutLang = currentPath.replace(/^\/(en|hu)/, "");
 const { lang } = Astro.props;
 ---
 <div class="lang-switcher">
-    <a href={`/en${pathWithoutLang}`} class={lang === "en" ? "active" : ""}>
-    {lang === "en" ? "English" : "Angol"}
+    <a href={`/en${pathWithoutLang}`} >
+        <span class={lang === "en" ? "active" : ""}>{lang === "en" ? "English" : "Angol"}</span>
     </a>
-    <a href={`/hu${pathWithoutLang}`} class={lang === "hu" ? "active" : ""}>
-        {lang === "hu" ? "Magyar" : "Hungarian"}
+    <a href={`/hu${pathWithoutLang}`}>
+        <span class={lang === "hu" ? "active" : ""}>{lang === "hu" ? "Magyar" : "Hungarian"}</span>
     </a>
 </div>
 <style>
     .lang-switcher {
-        width: 10rem;
+        width: 12rem;
         display: inline-flex;
         justify-content: center;
         gap: 0.5rem;
@@ -30,7 +30,7 @@ const { lang } = Astro.props;
         color: var(--soft-white);
     }
 
-    .lang-switcher a.active {
+    a .active {
         font-weight: bold;
     }
 

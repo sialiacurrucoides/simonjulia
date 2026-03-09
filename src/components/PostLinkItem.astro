@@ -1,0 +1,71 @@
+---
+import DatabaseIcon from "../assets/icons/DatabaseIcon.astro";
+import AstroIcon from "../assets/icons/AstroIcon.astro";
+
+const { title, date, slug, lang } = Astro.props;
+const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
+
+const iconList = new Map([
+    ["database-fundamentals", DatabaseIcon],
+    ["astro", AstroIcon],
+    // Add more mappings as needed
+]);
+
+const Icon = iconList.get(slug);
+---
+
+<li><a class="post-link" href={`/${lang}/blog/${slug}`}>
+   <div class="title-section">
+    <div class="icon-container">
+        {Icon && <Icon />}
+    </div>
+    {title}
+    </div>
+   <div>{formattedDate}</div>
+</a></li>
+
+<style>
+    li {
+        border: 2px solid var(--main-bg-color);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+    .icon-container {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 0.5rem;
+        width: 24px;
+        height: 24px;
+    }
+
+    .title-section {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .icon-image {
+        display: flex;
+        justify-items: center;
+        fill: var(--main-bg-color);
+    }
+
+     .post-link {
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        color: var(--main-bg-color);
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .post-link {
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        color: var(--main-bg-color);
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+    }
+</style>

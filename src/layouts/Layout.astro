@@ -2,7 +2,9 @@
 import Footer from "../components/Footer.astro";
 import Navigation from "../components/Navigation.astro";
 import { getLang } from "../i18n";
-import '@fontsource/Montserrat';
+import "@fontsource/montserrat/400.css";
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/400-italic.css"; 
 import "../styles/global.css";
 
 const { lang = "en" } = Astro.props;
@@ -17,8 +19,8 @@ const t = getLang(lang);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta name="description" content="The personal website of web developer Júlia Simon."/>
     <!-- favicon-->
-    <link rel="shortcut icon" href="./favicon/simonJ.svg" type="image/x-icon">
-    <link rel="icon" href="./favicon/simonJ.svg?" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon/simonJ.svg" type="image/x-icon">
+    <link rel="icon" href="/favicon/simonJ.svg?" type="image/x-icon">
   </head>
 
   <body>

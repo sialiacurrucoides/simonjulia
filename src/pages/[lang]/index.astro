@@ -1,4 +1,5 @@
 ---
+import DigitalGarden from "../../components/DigitalGarden.astro";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -8,9 +9,11 @@ export function getStaticPaths() {
   ];
 }
 
+
+
 const { lang } = Astro.params;
 ---
 
 <Layout lang={lang}>
-  <h1>{lang === "hu" ? "Kezdőlap" : "Home"}</h1>
+  <DigitalGarden lang={lang} />
 </Layout>
