@@ -1,0 +1,51 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PostLinkItem from '../../../components/PostLinkItem.astro';
+import Layout from '../../../layouts/Layout.astro';
+
+const { tag, lang } = Astro.params;
+
+export async function getStaticPaths(): Promise<{ params: { tag: string, lang: string }, props: { posts: CollectionEntry<'blog'>[] } }[]> {
+
+    const allPosts = await getCollection('blog');
+
+    const articlesHU = allPosts.filter(post => post.id.startsWith('hu/'));
+    const articlesEN = allPosts.filter(post => post.id.startsWith('en/'));
+
+  const uniqueTagsHU = [...new Set(articlesHU.map((post) => post.data.tags).flat())];
+  const uniqueTagsEN = [...new Set(articlesEN.map((post) => post.data.tags).flat())];
+
+  const huPaths = uniqueTagsHU.map(tag => {
+      const filteredPosts = articlesHU.filter((post) => post.data.tags.includes(tag));
+      return {params: { tag, lang: 'hu' }, props: {posts: filteredPosts }}
+  });
+
+  const enPaths = uniqueTagsEN.map(tag => {
+    const filteredPosts = articlesEN.filter((post) => post.data.tags.includes(tag));
+    return {params: { tag, lang: 'en' }, props: {posts: filteredPosts }}
+  });
+
+  return [...huPaths, ...enPaths];
+}
+
+const { posts } = Astro.props;
+
+console.log("posts: ", posts);
+
+---
+<Layout lang={lang}>
+  <ul class="post-list">
+    {posts.map((article) => <PostLinkItem title={article.data.title} date={article.data.date} slug={article.id.split('/')[1].replace(".md", "")} lang={lang} />)}
+  </ul>
+</Layout>
+
+<style>
+    .post-list {
+        list-style: none;
+        padding: 1rem;
+    }
+    
+    .post-list li {
+        margin-bottom: 1em;
+    }
+</style>
