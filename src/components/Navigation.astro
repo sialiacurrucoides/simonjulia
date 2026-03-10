@@ -9,7 +9,17 @@ const t = getLang(lang);
     <div id="logo">
         <a href=`/${lang}`><img src="/simon.png" width="26px" height="40px" alt="Simon logo"></a>
     </div>
-    <div><label for="hamburger-icon" class="hamburger"><i class="mobileMenuIcon fa fa-bars"></i></label></div>
+    <div><label for="hamburger-icon" class="hamburger">
+        <svg class="mobileMenuIcon hamburger-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <line x1="3" y1="6" x2="21" y2="6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="3" y1="12" x2="21" y2="12" stroke-width="2" stroke-linecap="round"/>
+            <line x1="3" y1="18" x2="21" y2="18" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="mobileMenuIcon hamburger-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+            <line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"/>
+            <line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </label></div>
     <input type="checkbox" id="hamburger-icon">
     <div class="nav-links">
         <a href=`/${lang}/#blog`>{t.nav.blog}</a>
@@ -82,6 +92,13 @@ const t = getLang(lang);
 	cursor: pointer;
 }
 
+.hamburger svg {
+	color: rgba(255, 255, 255, 0.9);
+	width: 1.8rem;
+	height: 1.8rem;
+	cursor: pointer;
+}
+
 @media screen and (min-width: 800px) {
 	.hamburger {
 		display: none;
@@ -127,19 +144,22 @@ const t = getLang(lang);
 
 <script>
     window.onload = () => {
+        const hamburgerCheckbox = document.querySelector('#hamburger-icon') as HTMLInputElement;
+        const hamburgerOpen = document.querySelector('.hamburger-open') as SVGElement;
+        const hamburgerClose = document.querySelector('.hamburger-close') as SVGElement;
 
-    document.querySelector('.mobileMenuIcon')?.addEventListener('click', (ev) => {
-        const mobileMenuIcon = ev.target  as HTMLInputElement;
+        if (!hamburgerCheckbox || !hamburgerOpen || !hamburgerClose) return;
 
-        if (!mobileMenuIcon) return;
+        const toggleIcon = () => {
+            if (hamburgerCheckbox.checked) {
+                hamburgerOpen.style.display = 'none';
+                hamburgerClose.style.display = 'block';
+            } else {
+                hamburgerOpen.style.display = 'block';
+                hamburgerClose.style.display = 'none';
+            }
+        };
 
-        if (!mobileMenuIcon.classList.contains('fa-close')) {
-            mobileMenuIcon.classList.remove('fa-bars');
-            mobileMenuIcon.classList.add('fa-close');
-        } else {
-            mobileMenuIcon.classList.remove('fa-close');
-            mobileMenuIcon.classList.add('fa-bars');
-        }
-    });
-}
+        hamburgerCheckbox.addEventListener('change', toggleIcon);
+    };
 </script>

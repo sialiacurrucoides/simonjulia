@@ -7,6 +7,8 @@ import Plastic3matchMobile from "../assets/projects/plastic3match-mobile.png";
 import BalloonLevitatorDesktop from "../assets/projects/balloon-game-laptop.png";
 import BalloonLevitatorMobile from "../assets/projects/balloon-game-mobile.png";
 import { getLang } from "../i18n";
+import GithubIcon from "../assets/icons/GithubIcon.astro";
+import GlobeIcon from "../assets/icons/GlobeIcon.astro";
 
 const { project } = Astro.props;
 
@@ -48,17 +50,17 @@ const description = descriptionsList.get(project.shortTitle) || project.descript
     </div>
     <p class="projectTitle">
         <a href={project.webpage} target="_blank" rel="noopener" rel="noreferrer" aria-label={`link to ${project.title}`}>{project.title}</a>
-        <a target="_blank" rel="noopener" rel="noreferrer"  href={`${project.github}`} aria-label={`link to repo ${project.github}`}><i class="fa fa-github"></i></a>
+        <a target="_blank" rel="noopener" rel="noreferrer"  href={`${project.github}`} aria-label={`link to repo ${project.github}`}><GithubIcon class="icon" width={24} height={24} /></a>
     </p>
     <div class=`projectCardInfo ${project.shortTitle} hidden`>
         <p>{description}</p>
         <p>{project.technologies}</p>
         <p>
             <a target="_blank" rel="noopener" rel="noreferrer" href={project.webpage} aria-label={`${project.title} webpage`}>
-                <i class="fa fa-globe"></i>
+                <GlobeIcon class="icon" />
             </a>
             <a target="_blank" rel="noopener" rel="noreferrer"  href={project.github} aria-label={`${project.title} code on github`}>
-                <i class="fa fa-github"></i></a>
+                <GithubIcon class="icon" /></a>
             </p>
     </div>
     <br>
@@ -144,11 +146,12 @@ const description = descriptionsList.get(project.shortTitle) || project.descript
         padding: 0.3rem;
     }
 
-    .projectCardInfo .fa {
+    .projectCardInfo .icon {
         text-decoration: none;
         color: #fff;
         padding: 0.5rem;
-        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
     }
 
     .projectTitle {
@@ -160,10 +163,11 @@ const description = descriptionsList.get(project.shortTitle) || project.descript
         color: #555;
     }
 
-    .projectTitle .fa {
-        padding: 0 0.5rem;
-        font-size: 1.5rem;
+    .projectTitle .icon {
+        width: 1rem;
+        height: 1rem;
         color: #555;
+        margin-left: 0.25rem;
     }
 
     @media screen and (max-width: 600px) {
