@@ -17,6 +17,12 @@ export default {
     choiceOfWeapon: "Választott eszközeim:",
     hobbies: "Hobbik: kertészkedés, kutyázás, növényi alapú receptekkel való kísérletezés, olvasás"
   },
+  projects: {
+    description: "Néhány az első hobby projektjeim közül, amikor elkezdtem webfejlesztéssel foglalkozni.",
+    persevereDescription: "Célokat tűzhetsz ki magadnak, és növelheted a megszakítás nélküli elköteleződés pontszámod azzal, hogy minden nap bejelentkezel és bejelölöd a napot (ha dolgoztál rajta). Teszteléshez használhatod a 'test@gmail.com' fiókot a 'TestTest2' jelszóval.",
+    plastic3matchDescription: "Csak az újrahasznosítható műanyag darabokat tudod kombinálni és eltávolítani, kivéve ha új technológiát fejlesztesz.",
+    balloonDescription: "Emeld fel a léggömböt úgy, hogy háromszor egymás után helyesen különbözteted meg az egymást követő hangok sorrendjét. (Lehetséges, hogy az irányított hangok nem működnek.)"
+  },
   footer: {
     copyright: "- © Simon Júlia 2021 -"
   }

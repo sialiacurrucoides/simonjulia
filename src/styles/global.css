@@ -15,6 +15,7 @@
   --soft-white: #ccc;
   --border-radius: 0.3rem;
   --darkest-blue: rgb(10, 10, 19);
+  --inner-container-width: 1000px;
 }
 
 strong {
@@ -25,5 +26,20 @@ strong {
 	background: var(--main-bg-color);
 	background-image: linear-gradient(to left, var(--darkest-blue), var(--main-bg-color));
 	color: var(--soft-white);
+}
+
+.light-theme {
+	background: #f1f1f1;
+	color: #555;
+}
+
+.inner-container {
+    max-width: var(--inner-container-width);
+    padding: 2em;
+    margin: 0 auto;
+}
+
+.hidden {
+	display: none;
 }
 

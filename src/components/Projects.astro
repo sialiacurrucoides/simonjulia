@@ -1,0 +1,80 @@
+---
+import { getLang } from "../i18n";
+import { projects } from "../constants/index";
+import ProjectCard from "./ProjectCard.astro";
+
+
+const { lang = "en" } = Astro.props;
+const t = getLang(lang);
+
+---
+<section id="projects" class="light-theme">
+    <div class="inner-container">
+        <h2>{t.nav.projects}</h2>
+        <p class="description">{t.projects.description}</p>
+        <div class="container">
+            {projects.map((project: unknown) => (
+                <ProjectCard project={project} />
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .container {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .inner-container {
+        max-width: 1200px;
+        padding: 2em;
+        margin: 0 auto;
+    }
+
+    #projects {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    #projects h2 {
+        margin: 2rem 0 1rem;
+        font-weight: 400;
+    }
+
+    .description {
+        margin-bottom: 2rem;
+    }
+
+</style>
+
+<script>
+    window.onload = () => {
+        document.querySelector(".nameCard")?.classList.remove("hidden");
+        let projectsContainer = document.querySelector("#projects .container");
+
+        projectsContainer?.addEventListener("click", (ev) => {
+        let targetClasses = ((ev.target as HTMLElement)?.parentNode?.parentNode?.parentNode as Element)?.classList.value.split(" ");
+
+        if (targetClasses[0] === "projectCard") {
+                let whichCard = targetClasses[1];
+                let cardInfoSelector = `.projectCardInfo.${whichCard}`;
+                
+                const cardInfoElement = document.querySelector(cardInfoSelector);
+
+                cardInfoElement?.classList.toggle("hidden");
+            };
+        });
+        let containers = document.querySelectorAll(".projectCardInfo");
+        containers.forEach(element => {
+            element.addEventListener("mouseleave", (ev) => {
+                element.classList.add("hidden");
+            });
+        });
+    };
+
+
+</script>

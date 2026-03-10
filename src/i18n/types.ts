@@ -17,6 +17,12 @@ export type Translation = {
     choiceOfWeapon: string;
     hobbies: string;
   };
+  projects: {
+    description: string;
+    persevereDescription: string;
+    plastic3matchDescription: string;
+    balloonDescription: string;
+  };
   footer: {
     copyright: string;
   };

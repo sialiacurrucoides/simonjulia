@@ -1,0 +1,181 @@
+---
+import { Picture } from "astro:assets";
+import Persevere2Desktop from "../assets/projects/persevere2-laptop.png";
+import Persevere2Mobile from "../assets/projects/persevere2-mobile.png";
+import Plastic3matchDesktop from "../assets/projects/plastic3match-laptop.webp";
+import Plastic3matchMobile from "../assets/projects/plastic3match-mobile.png";
+import BalloonLevitatorDesktop from "../assets/projects/balloon-game-laptop.png";
+import BalloonLevitatorMobile from "../assets/projects/balloon-game-mobile.png";
+import { getLang } from "../i18n";
+
+const { project } = Astro.props;
+
+const desktopImageList = new Map([
+    ["Persevere2", Persevere2Desktop],
+    ["Plastic3match", Plastic3matchDesktop],
+    ["BalloonLevitator", BalloonLevitatorDesktop],
+    // Add more mappings as needed
+]);
+
+const mobileImageList = new Map([
+    ["Persevere2", Persevere2Mobile],
+    ["Plastic3match", Plastic3matchMobile],
+    ["BalloonLevitator", BalloonLevitatorMobile],
+    // Add more mappings as needed
+]);
+
+const DesktopImage = desktopImageList.get(project.shortTitle);
+const MobileImage = mobileImageList.get(project.shortTitle);
+
+const { lang = "en" } = Astro.params;
+const t = getLang(lang);
+
+const descriptionsList = new Map([
+    ["Persevere2", t.projects.persevereDescription],
+    ["Plastic3match", t.projects.plastic3matchDescription],
+    ["BalloonLevitator", t.projects.balloonDescription],
+    // Add more mappings as needed
+]);
+
+const description = descriptionsList.get(project.shortTitle) || project.description;
+---
+<div class=`projectCard ${project.shortTitle}`>
+    <div class="laptop">
+        {!!DesktopImage && <Picture src={DesktopImage} alt={`${project.title} image`} />}
+    </div>
+    <div class="mobile">
+        {!!MobileImage && <Picture src={MobileImage} alt={`${project.title} image`} />}
+    </div>
+    <p class="projectTitle">
+        <a href={project.webpage} target="_blank" rel="noopener" rel="noreferrer" aria-label={`link to ${project.title}`}>{project.title}</a>
+        <a target="_blank" rel="noopener" rel="noreferrer"  href={`${project.github}`} aria-label={`link to repo ${project.github}`}><i class="fa fa-github"></i></a>
+    </p>
+    <div class=`projectCardInfo ${project.shortTitle} hidden`>
+        <p>{description}</p>
+        <p>{project.technologies}</p>
+        <p>
+            <a target="_blank" rel="noopener" rel="noreferrer" href={project.webpage} aria-label={`${project.title} webpage`}>
+                <i class="fa fa-globe"></i>
+            </a>
+            <a target="_blank" rel="noopener" rel="noreferrer"  href={project.github} aria-label={`${project.title} code on github`}>
+                <i class="fa fa-github"></i></a>
+            </p>
+    </div>
+    <br>
+</div>
+
+<style>
+
+    .projectCard {
+        width: 20rem; /*260px; /*30%;*/
+        margin: auto;
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .laptop {
+        height: 16rem;
+        width: 20rem;
+        border: 0.5rem solid #000;
+        box-sizing: content-box;
+        border-radius: var(--border-radius);
+        position: relative;
+        top: 0;
+        overflow: hidden;
+    }
+
+    .mobile {
+        height: 11.25rem;
+        width: 6rem;
+        box-sizing: content-box;
+        border: 0.5rem solid #000;
+        border-radius: var(--border-radius);
+        border-left-width: 0.2rem;
+        border-right-width: 0.2rem;
+        display: inline-block;
+        position: absolute;
+        bottom: 7.5rem;
+        right: 0.5rem;
+        overflow: hidden;
+        background: #333;
+    }
+
+    .projectCard img {
+        width: 100%;
+        height: inherit;
+        position: center;
+    }
+
+    .projectCard p {
+        padding: 2rem 0.5rem;
+        text-align: left;
+    }
+
+    .projectCardInfo {
+        background: rgba(0, 0, 0, 0.9);
+        position: absolute;
+        top: 0;
+        height: 95%;
+        width: 105%;
+        color: var(--soft-white);
+        font-size: 0.75rem;
+        color: #fff;
+        padding: 0.8rem;
+        z-index: 10;
+        border-radius: var(--border-radius);
+        animation: grow 0.6s ease-out;
+        transform-origin: top left;
+    }
+
+    @keyframes grow {
+        0% {
+            transform: scale(0);
+            background: rgba(0, 0, 0, 0);
+        }
+        100% {
+            transform: scale(1);
+            background: rgba(0, 0, 0, 0.9);
+        }
+    }
+
+    .projectCardInfo p {
+        margin: 0;
+        padding: 0.3rem;
+    }
+
+    .projectCardInfo .fa {
+        text-decoration: none;
+        color: #fff;
+        padding: 0.5rem;
+        font-size: 2rem;
+    }
+
+    .projectTitle {
+        height: 6rem;
+    }
+
+    .projectTitle a {
+        text-decoration: none;
+        color: #555;
+    }
+
+    .projectTitle .fa {
+        padding: 0 0.5rem;
+        font-size: 1.5rem;
+        color: #555;
+    }
+
+    @media screen and (max-width: 600px) {
+        .projectCard {
+            margin-top: 2.2rem;
+            display: block;
+            width: 90vw;
+        }
+
+        .projectCard .laptop {
+            width: 90vw;
+        }
+    }
+
+</style>

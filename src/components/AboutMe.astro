@@ -7,7 +7,7 @@ const { lang = "en" } = Astro.props;
 const t = getLang(lang);
 ---
     <section id="bio" class="dark-theme">
-        <div class="aboutMe">
+        <div class="aboutMe inner-container">
             <div class="aboutText">
                 <h2>{t.nav.about}</h2>
                 <p>{t.about.degree}</p>
@@ -42,7 +42,7 @@ const t = getLang(lang);
     }
 
     .aboutMe {
-        margin: 2rem var(--left-margin);
+        margin: 2rem auto;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
