@@ -43,23 +43,23 @@ const description = descriptionsList.get(project.shortTitle) || project.descript
 ---
 <div class=`projectCard ${project.shortTitle}`>
     <div class="laptop">
-        {!!DesktopImage && <Picture src={DesktopImage} alt={`${project.title} image`} />}
+        {!!DesktopImage && <Picture src={DesktopImage} alt={`${project.title} image`} width={257} height={192} formats={['webp', 'png']}/>}
     </div>
     <div class="mobile">
-        {!!MobileImage && <Picture src={MobileImage} alt={`${project.title} image`} />}
+        {!!MobileImage && <Picture src={MobileImage} alt={`${project.title} image`}/>}
     </div>
     <p class="projectTitle">
         <a href={project.webpage} target="_blank" rel="noopener" rel="noreferrer" aria-label={`link to ${project.title}`}>{project.title}</a>
-        <a target="_blank" rel="noopener" rel="noreferrer"  href={`${project.github}`} aria-label={`link to repo ${project.github}`}><GithubIcon class="icon" width={24} height={24} /></a>
+        <a target="_blank" rel="noopener" rel="noreferrer"  href={`${project.github}`} aria-label={`link to repo ${project.github}`} title={`link to repo ${project.github}`}><GithubIcon class="icon" width={24} height={24} /></a>
     </p>
     <div class=`projectCardInfo ${project.shortTitle} hidden`>
         <p>{description}</p>
         <p>{project.technologies}</p>
         <p>
-            <a target="_blank" rel="noopener" rel="noreferrer" href={project.webpage} aria-label={`${project.title} webpage`}>
+            <a target="_blank" rel="noopener" rel="noreferrer" href={project.webpage} aria-label={`${project.title} webpage`} title={`${project.title} webpage`}>
                 <GlobeIcon class="icon" />
             </a>
-            <a target="_blank" rel="noopener" rel="noreferrer"  href={project.github} aria-label={`${project.title} code on github`}>
+            <a target="_blank" rel="noopener" rel="noreferrer"  href={project.github} aria-label={`${project.title} code on github`} title={`${project.title} code on github`}>
                 <GithubIcon class="icon" /></a>
             </p>
     </div>
