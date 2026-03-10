@@ -20,7 +20,7 @@ const { post } = Astro.props;
 const { Content } = await post.render();
 const { lang } = Astro.params;
 ---
-<Layout lang={lang}>
+<Layout lang={lang} description={post.data.description}>
   <MarkdownLayout frontmatter={post.data}>
     <Content />
   </MarkdownLayout>

@@ -7,8 +7,15 @@ import "@fontsource/montserrat/700.css";
 import "@fontsource/montserrat/400-italic.css"; 
 import "../styles/global.css";
 
-const { lang = "en" } = Astro.props;
+interface Props {
+  lang?: string;
+  description?: string;
+}
+
+const { lang = "en", description } = Astro.props as Props;
 const t = getLang(lang);
+
+const metaDescription = description || t.metaDescription;
 ---
 
 <html lang={lang}>
@@ -17,7 +24,7 @@ const t = getLang(lang);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simon Júlia - Web developer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <meta name="description" content="The personal website of web developer Júlia Simon."/>
+    <meta name="description" content={metaDescription} />
     <!-- favicon-->
     <link rel="shortcut icon" href="/favicon/simonJ.svg" type="image/x-icon">
     <link rel="icon" href="/favicon/simonJ.svg?" type="image/x-icon">

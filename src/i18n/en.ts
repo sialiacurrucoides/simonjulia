@@ -1,4 +1,5 @@
 export default {
+  metaDescription: "The personal website of web developer Júlia Simon.",
   nav: {
     home: "Home",
     blog: "Digital garden",

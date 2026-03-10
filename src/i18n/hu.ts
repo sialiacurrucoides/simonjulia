@@ -1,4 +1,5 @@
 export default {
+  metaDescription: "Simon Júlia web fejlesztő",
   nav: {
     home: "Főoldal",
     blog: "Digitális kert",

@@ -1,4 +1,5 @@
 export type Translation = {
+  metaDescription: string;
   nav: {
     home: string;
     blog: string;
