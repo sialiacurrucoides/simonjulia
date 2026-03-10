@@ -4,12 +4,17 @@ import { getLang } from "../i18n";
 import type { Article } from "../types";
 import digitalGardenImage from "../assets/digital_garden.svg";
 import PostLinkItem from "./PostLinkItem.astro";
+import TagList from "./TagList.astro";
 
 const articlesHU: Article[] = Object.values(import.meta.glob('../content/blog/hu/*.md', { eager: true }));
 const articlesEN: Article[] = Object.values(import.meta.glob('../content/blog/en/*.md', { eager: true }));
 
 const { lang = "en" } = Astro.props;
 const t = getLang(lang);
+
+const tagsHU = [...new Set(articlesHU.map((article) => article.frontmatter.tags).flat())];
+const tagsEN = [...new Set(articlesEN.map((article) => article.frontmatter.tags).flat())];
+const tags = lang === "hu" ? tagsHU : tagsEN;
 ---
 <div id="blog">
   <h1>{t.nav.blog}</h1>
@@ -19,6 +24,7 @@ const t = getLang(lang);
         <Image src={digitalGardenImage} alt="A digital garden" width={300} height={300} class="digital-garden-image"/>
     </div>
     <div class="list-container">
+        <TagList tags={tags}/>
         <ul class="post-list">
             {(lang === "hu" ? articlesHU : articlesEN).map((article) => (
                 <PostLinkItem title={article.frontmatter.title} date={article.frontmatter.date} slug={article.file.split(`${lang}/`)[1].replace(".md", "")} lang={lang} />
@@ -53,6 +59,10 @@ const t = getLang(lang);
         display: grid;
         grid-template-columns: 1fr 2fr;
     }  
+
+    .post-list {
+        margin-top: 1rem;
+    }
     
     .image-container, .list-container {
         display: inline-block;

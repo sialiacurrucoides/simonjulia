@@ -1,7 +1,8 @@
 ---
 const { tag } = Astro.props;
+const { lang } = Astro.params;
 ---
-<p class="tag"><a class="link" href={`../tags/${tag}`}>{tag}</a></p>
+<p class="tag"><a class="link" href={`/${lang}/tags/${tag}`}>{tag}</a></p>
 
 <style>
   .link {
