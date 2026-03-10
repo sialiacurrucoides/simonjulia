@@ -24,7 +24,7 @@ const t = getLang(lang);
   </head>
 
   <body>
-    <header>
+    <header class="header">
         <Navigation lang={lang} />
     </header>
     <main>
@@ -40,5 +40,12 @@ const t = getLang(lang);
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+    }
+
+    .header {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 99;
     }
 </style>

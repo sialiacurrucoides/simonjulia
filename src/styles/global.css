@@ -21,3 +21,9 @@ strong {
   font-weight: 700;
 }
 
+.dark-theme {
+	background: var(--main-bg-color);
+	background-image: linear-gradient(to left, var(--darkest-blue), var(--main-bg-color));
+	color: var(--soft-white);
+}
+

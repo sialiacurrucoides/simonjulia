@@ -16,14 +16,14 @@ const tagsHU = [...new Set(articlesHU.map((article) => article.frontmatter.tags)
 const tagsEN = [...new Set(articlesEN.map((article) => article.frontmatter.tags).flat())];
 const tags = lang === "hu" ? tagsHU : tagsEN;
 ---
-<div id="blog">
+<section id="blog">
   <h1>{t.nav.blog}</h1>
   <p class="definition">{t.digitalGarden.definition}</p>
   <p class="introduction">{t.digitalGarden.introduction}</p>
   <div class="content-container">
-    <div class="image-container">
+    <aside class="image-container">
         <Image src={digitalGardenImage} alt="A digital garden" width={300} height={300} class="digital-garden-image"/>
-    </div>
+    </aside>
     <div class="list-container">
         <TagList tags={tags}/>
         <ul class="post-list">
@@ -33,13 +33,14 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
         </ul>
     </div>
   </div>
-</div>
+</section>
 
 <style>
     #blog {
         max-width: 1200px;
         margin: 0 auto;
         padding: 2em;
+        padding-top: 8rem;
     }
     
     #blog ul {

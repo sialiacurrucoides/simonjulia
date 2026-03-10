@@ -1,4 +1,5 @@
 ---
+import AboutMe from "../../components/AboutMe.astro";
 import DigitalGarden from "../../components/DigitalGarden.astro";
 import Layout from "../../layouts/Layout.astro";
 
@@ -16,4 +17,5 @@ const { lang } = Astro.params;
 
 <Layout lang={lang}>
   <DigitalGarden lang={lang} />
+  <AboutMe lang={lang} />
 </Layout>

@@ -1,0 +1,87 @@
+---
+import { getLang } from "../i18n";
+import SimonJuliaImage from "../assets/Simon-Julia.png";
+import { Image } from "astro:assets";
+
+const { lang = "en" } = Astro.props;
+const t = getLang(lang);
+---
+    <section id="bio" class="dark-theme">
+        <div class="aboutMe">
+            <div class="aboutText">
+                <h2>{t.nav.about}</h2>
+                <p>{t.about.degree}</p>
+                <p>{t.about.programmingRoots}</p>
+                <p>{t.about.programmingWhy}</p>
+                <p>{t.about.experience}</p>
+                <p>{t.about.choiceOfWeapon} <strong>Typescript</strong>, React (Library), Nestjs (Backend), Figma (Prototyping), SPSS/Matlab (data analysis), Anaconda-Spyder (ML)</p>
+                <p>{t.about.hobbies}</p>
+                <br>
+            </div>
+            <div class="aboutPic">
+                <Image src={SimonJuliaImage} alt="Simon Júlia" width={163} height={201} />
+            </div>
+        </div>
+    </section>
+
+<style>
+    #bio {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    #bio h2,
+    #bio p {
+        /*margin: 1.5rem 2rem 1.5rem var(--left-margin);*/
+        padding-top: 1.5rem;
+    }
+
+    #bio p::selection {
+        background-color: var(--main-bg-color-light);
+        color: var(--soft-white);
+    }
+
+    .aboutMe {
+        margin: 2rem var(--left-margin);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .aboutText {
+        padding-right: 3rem;
+    }
+
+    .aboutPic {
+        margin: none;
+    }
+
+    .aboutPic img {
+        border: 1px solid transparent;
+        border-radius: 25% 0.3rem 50% 0.3rem;
+        transform: translateY(3rem);
+    }
+
+    @media (max-width: 800px) {
+        .aboutMe {
+            flex-direction: column;
+        }
+        .aboutPic {
+            margin: auto;
+        }
+        .aboutPic img {
+            border-radius: 25% 0.3rem 50% 0.3rem;
+            transform: translateY(0);
+            margin-bottom: 2rem;
+        }
+        .aboutText {
+            padding-right: 0;
+        }
+    }
+
+    #bio a {
+        text-decoration: none;
+        color: var(--soft-white);
+        padding-bottom: 2rem;
+    }
+</style>
