@@ -19,6 +19,7 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
 <div id="blog">
   <h1>{t.nav.blog}</h1>
   <p class="definition">{t.digitalGarden.definition}</p>
+  <p class="introduction">{t.digitalGarden.introduction}</p>
   <div class="content-container">
     <div class="image-container">
         <Image src={digitalGardenImage} alt="A digital garden" width={300} height={300} class="digital-garden-image"/>
@@ -53,6 +54,11 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
     .definition {
         font-style: italic;
         padding: 1rem 0;
+        color: var(--main-bg-color);
+    }
+
+    .introduction {
+        padding-bottom: 2rem;
     }
 
     .content-container {
