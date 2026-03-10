@@ -16,6 +16,11 @@
   --border-radius: 0.3rem;
   --darkest-blue: rgb(10, 10, 19);
   --inner-container-width: 1000px;
+  --light-bg: #f1f1f1;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 strong {
@@ -29,7 +34,7 @@ strong {
 }
 
 .light-theme {
-	background: #f1f1f1;
+	background: var(--light-bg);
 	color: #555;
 }
 

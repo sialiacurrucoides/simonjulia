@@ -2,11 +2,13 @@
 import { getLang } from "../i18n";
 import SimonJuliaImage from "../assets/Simon-Julia.png";
 import { Image } from "astro:assets";
+import SectionDivider from "./SectionDivider.astro";
 
 const { lang = "en" } = Astro.props;
 const t = getLang(lang);
 ---
     <section id="bio" class="dark-theme">
+        <SectionDivider />
         <div class="aboutMe inner-container">
             <div class="aboutText">
                 <h2>{t.nav.about}</h2>
@@ -26,13 +28,13 @@ const t = getLang(lang);
 
 <style>
     #bio {
-        padding-top: 2rem;
+        margin-top: 2rem;
         padding-bottom: 2rem;
+        clip-path: ellipse(100% 100% at 34% 0%);
     }
 
     #bio h2,
     #bio p {
-        /*margin: 1.5rem 2rem 1.5rem var(--left-margin);*/
         padding-top: 1.5rem;
     }
 

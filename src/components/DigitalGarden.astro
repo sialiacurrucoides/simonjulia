@@ -18,7 +18,7 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
 ---
 <section id="blog" class="light-theme">
     <div class="inner-container">
-        <h1>{t.nav.blog}</h1>
+        <h1 class="title">{t.nav.blog}</h1>
         <p class="definition">{t.digitalGarden.definition}</p>
         <p class="introduction">{t.digitalGarden.introduction}</p>
         <div class="content-container">
@@ -40,9 +40,9 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
 <style>
     #blog {
         width: 100%;
-        padding-top: 4rem;
         display: flex;
         justify-content: center;
+        scroll-margin-top: 5rem;
     }
     
     #blog ul {
@@ -52,6 +52,10 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
     
     #blog li {
         margin-bottom: 1em;
+    }
+
+    .title {
+        margin-top: 2rem;
     }
 
     .definition {
