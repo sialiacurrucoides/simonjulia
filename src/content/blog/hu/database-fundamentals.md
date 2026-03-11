@@ -38,5 +38,7 @@ Például a Postgresben az ismételhető olvasás alapvetően egy pillanatfelvé
 
 Egy másik fontos adatbázis-eszköz az **indexelés**, amely javíthatja az olvasási időt. Az index egy olyan adatstruktúra, amely lehetővé teszi az adatok elérését a heap (a lemezen lévő adatok) szekvenciális olvasásától eltérő módon. Általában egy *B+fa* struktúra, amely lehetővé teszi forgatókönyvek gyors kiküszöbölését, miközben a fa egyik ágán haladunk lefelé. A végén lévő levelek vagy a kért sort tartalmazzák (indexelt szervezett táblák, pl. MySQL index az elsődleges kulcs alapján), vagy egy azonosítót, amely a heap megfelelő oldalára mutat (tuple azonosító Postgres esetén). Az előbbi esetben a másodlagos indexek az elsődleges kulcsra mutatnak, tehát két fa bejárására van szükség, amit szem előtt kell tartani. A leggyorsabb az indexbeolvasás, amikor az index elég kicsi ahhoz, hogy a memóriában tárolható legyen, és nincs szükség olyan adatokra, amelyek nem részei az indexnek. Azonban ne feledjük, hogy ha a tábla túl nagy, akkor még az indexet is tárolni kell, és I/O műveletekre van szükség az indexelt adatok lekéréséhez is. Nem a legjobb stratégia minden elemhez indexet létrehozni, hiszen egy frissítés lelassíthatja a választ, mivel nemcsak a tábla egy sorát, hanem az összes releváns indexet frissíteni kell.
 
-<img src="/b_plus_tree.png" alt="B+tree - the leaves are sequential compared to the legacy B-tree" width="600">
-B+fa – a levelek szekvenciálisak a hagyományos B-fához képest
+<figure>
+  <img src="/b_plus_tree.webp" alt="B+tree - the leaves are sequential compared to the legacy B-tree" loading="lazy" />
+  <figcaption>B+fa – a levelek szekvenciálisak a hagyományos B-fához képest</figcaption>
+</figure>

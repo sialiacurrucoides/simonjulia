@@ -31,5 +31,7 @@ For example, repeatable read in Postgres is basically a snapshot isolation. It i
 
 Another important database tool is **indexing**, which can improve the read time. An index is a data structure which allows data access in another way than the sequential read of the heap (data on the disk). It is usually a *B+tree* structure which allows the quick elimination of scenarios as we traverse down one of the branches of this tree. The leaves at the end either contain the requested row (index organized tables eg. MySQL index based on the primary key) or an identifier which points to the relevant page in the heap (tuple id in the case of Postgres). In the former case the secondary indexes point to the primary key, so two tree traversing is required which has to be kept in mind. The quickest is an index only scan, when the index is small enough to be kept in memory and no data is required which is not part of the index. However, keep in mind, that if the table is too big, even the index needs to be stored and requires I/Os to fetch even the indexed data. Creating indexes for everything is not the best strategy, because an update can slow down the response, since not only a row in the heap, but all the relevant indexes should be updated.
 
-<img src="/b_plus_tree.png" alt="B+tree - the leaves are sequential compared to the legacy B-tree" width="600">
-B+tree - the leaves are sequential compared to the legacy B-tree
+<figure>
+  <img src="/b_plus_tree.webp" alt="B+tree - the leaves are sequential compared to the legacy B-tree" loading="lazy" />
+  <figcaption>B+tree - the leaves are sequential compared to the legacy B-tree</figcaption>
+</figure>

@@ -1,7 +1,6 @@
 export type Translation = {
   metaDescription: string;
   nav: {
-    home: string;
     blog: string;
     about: string;
     projects: string;

@@ -1,4 +1,5 @@
 ---
+import { Picture } from "astro:assets";
 import { getLang } from "../i18n";
 import LanguageSelector from "./LanguageSelector.astro";
 
@@ -7,7 +8,9 @@ const t = getLang(lang);
 ---
 <nav class="nav">
     <div id="logo">
-        <a href=`/${lang}`><img src="/simon.png" width="26px" height="40px" alt="Simon logo"></a>
+        <a href=`/${lang}`>
+            <Picture src="/simon.webp" alt="Simon logo" width={26} height={40} formats={['avif', 'webp']} />
+        </a>
     </div>
     <div><label for="hamburger-icon" class="hamburger">
         <svg class="mobileMenuIcon hamburger-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

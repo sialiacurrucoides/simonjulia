@@ -14,9 +14,7 @@ const blog = defineCollection({
 
 export type BlogArticle = z.infer<typeof blogSchema>;
 
-const home = defineCollection({});
 
 export const collections = {
-  blog,
-  home
+  blog
 };
