@@ -43,10 +43,10 @@ const description = descriptionsList.get(project.shortTitle) || project.descript
 ---
 <div class=`projectCard ${project.shortTitle}`>
     <div class="laptop">
-        {!!DesktopImage && <Picture src={DesktopImage} alt={`${project.title} image`} width={257} height={192} formats={['webp', 'png']}/>}
+        {!!DesktopImage && <Picture src={DesktopImage} alt={`${project.title} image`} width={257} height={192} formats={['avif', 'webp', 'png']}/>}
     </div>
     <div class="mobile">
-        {!!MobileImage && <Picture src={MobileImage} alt={`${project.title} image`}/>}
+        {!!MobileImage && <Picture src={MobileImage} alt={`${project.title} image`} formats={['avif', 'webp', 'png']}/>}
     </div>
     <p class="projectTitle">
         <a href={project.webpage} target="_blank" rel="noopener" rel="noreferrer" aria-label={`link to ${project.title}`}>{project.title}</a>
