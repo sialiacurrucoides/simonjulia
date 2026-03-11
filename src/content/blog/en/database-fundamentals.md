@@ -24,6 +24,9 @@ There are five theoretical **levels of isolation** that can be implemented by a 
 - *Repeatable read* - this makes sure that while a query reads a row, that row does not change
 - *Snapshot* - the transaction “sees” only the result of transactions which were committed before the start of the given transaction (not just the target row is locked, so phantom reads can be avoided)
 - *Serializable* - its effect is like transactions were run one after another - this protects from everything but it slows the processes down, so it is not the default choice.
+
+<br>
+
 It is worth noting that the theoretical description of an isolation level name is not necessarily in line with their implementation. 
 For example, repeatable read in Postgres is basically a snapshot isolation. It is best to know the default isolation level of your database and change that based on the given use case. For example: read committed is the default in Postgres and repeatable read is the default in MySQL.
 
