@@ -4,7 +4,7 @@ import SimonJuliaImage from "../assets/Simon-Julia.png";
 import { Image } from "astro:assets";
 import SectionDivider from "./SectionDivider.astro";
 
-const { lang = "en" } = Astro.props;
+const { lang = "en" } = Astro.params;
 const t = getLang(lang);
 ---
     <section id="bio" class="dark-theme">
