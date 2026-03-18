@@ -4,7 +4,7 @@ const currentPath = Astro.url.pathname;
 // remove the language prefix
 const pathWithoutLang = currentPath.replace(/^\/(en|hu)/, "");
 
-const { lang } = Astro.props;
+const { lang } = Astro.params;
 ---
 <div class="lang-switcher">
     <a href={`/en${pathWithoutLang}`} >

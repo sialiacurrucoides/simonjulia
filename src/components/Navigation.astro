@@ -3,7 +3,7 @@ import { Picture } from "astro:assets";
 import { getLang } from "../i18n";
 import LanguageSelector from "./LanguageSelector.astro";
 
-const { lang = "en" } = Astro.props;
+const { lang = "en" } = Astro.params;
 const t = getLang(lang);
 ---
 <nav class="nav">
