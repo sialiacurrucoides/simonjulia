@@ -1,10 +1,10 @@
 ---
 title: "Akadálymentesítés"
-description: "Az akadálymentesítés célja, hogy elérhetővé tegyük az internetes tartalmakat mindenki számára. Egyes becslések szerint a felhasználók 15%-a küzd valamilyen nehézséggel, ami miatt kisegítő technológiát kell használnia. A jelen cikkben igyekeztem összegyűjteni pár hasznos információt, amelyeket szem előtt tarthatunk, hogy használhatóbb honlapokat készítsünk."
+description: "Az akadálymentesítés célja, hogy elérhetővé tegyük az internetes tartalmakat mindenki számára. Egyes becslések szerint a felhasználók 15%-a küzd valamilyen nehézséggel, ami miatt kisegítő technológiát kell használnia. A jelen cikkben igyekeztem összegyűjteni pár hasznos információt, amelyeket érdemes szem előtt tarthatunk, hogy használhatóbb honlapokat készítsünk."
 date: 2026-03-19
 tags: ["frontend", "UX", "accessibility"]
 ---
-Amikor hallottam a 15%-ot, kicsit meglepődtem. Azonban ha belegondolunk, egyáltalán nem ritka, hogy valakinek nehézsége adódik valamelyik érzékszervével vagy akár kognitív funkciójával. Például az öregedéssel sokak látása romlik. Ilyenkor megoldás lehet, hogy ránagyít az oldalra, de egy olyan apróság, hogy a szöveg nem igazodik a kijelző méretéhez, meglehetősen megnehezítheti az olvasást. Hiszen minden sornál vissza kell görgetni az oldal elejére.  
+Amikor hallottam a 15%-16%-ot (WHO becslés), kicsit meglepődtem. Azonban ha belegondolunk, egyáltalán nem ritka, hogy valakinek nehézsége adódik valamelyik érzékszervével vagy akár kognitív funkciójával. Például az öregedéssel sokak látása romlik. Ilyenkor megoldás lehet, hogy ránagyít az oldalra, de egy olyan apróság, hogy a szöveg nem igazodik a kijelző méretéhez, meglehetősen megnehezítheti az olvasást. Hiszen minden sornál vissza kell görgetni az oldal elejére.  
 A komoly születési vagy betegségből adódó nehézségeket viszont sokaknak elképzelni is nehéz, amikor például egy súlyosabb motoros diszfunkció miatt összesen csak két nagy gomb áll az illető rendelkezésére, hogy interakcióba lépjen az oldallal. Akkor tényleg nem mindegy, hogy az oldal mennyire támogatja a könnyebb navigációt.  
 Az akadálymentesítés nem „edge-case" fejlesztés, mindenki számára javíthatja a használatot.  
 Arról is érdemes tudni fejlesztőként vagy designerként, hogy az EU-ban minden közszférában működő szervezet internetes honlapjának kötelező megfelelnie az elérhetőségi irányelveknek ((EU) 2016/2102).
