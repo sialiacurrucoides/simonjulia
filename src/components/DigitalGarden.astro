@@ -9,7 +9,7 @@ import TagList from "./TagList.astro";
 const articlesHU: Article[] = Object.values(import.meta.glob('../content/blog/hu/*.md', { eager: true }));
 const articlesEN: Article[] = Object.values(import.meta.glob('../content/blog/en/*.md', { eager: true }));
 
-const { lang = "en" } = Astro.props;
+const { lang = "en" } = Astro.params;
 const t = getLang(lang);
 
 const tagsHU = [...new Set(articlesHU.map((article) => article.frontmatter.tags).flat())];
@@ -52,12 +52,12 @@ const tags = lang === "hu" ? tagsHU : tagsEN;
         scroll-margin-top: 5rem;
     }
     
-    #blog ul {
+    .post-list {
         list-style: none;
         padding: 0;
     }
     
-    #blog li {
+    .post-list li {
         margin-bottom: 1em;
     }
 

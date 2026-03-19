@@ -24,6 +24,11 @@ export default {
     balloonDescription: "Lift up the balloon by correctly discriminating the order of consecutive sounds three times in a row. (Not all the sounds are supported on all machines.)"
   },
   footer: {
-    copyright: "- © Júlia Simon 2021 -"
+    copyright: "- © Júlia Simon 2021 -",
+  },
+  dyslexicToggle: {
+    dyslexicMode: "Dyslexia friendly mode",
+    dyslexicModeDisclaimer: "Your preference will be saved to your browser's localstorage so that it will persist even when you change pages. By using the button, you accept this saving method. The website operator does not see this and does not save it in any other way. It is on your own computer.",
+    settings: "Settings"
   }
 };

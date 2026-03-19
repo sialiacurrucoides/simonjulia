@@ -1,0 +1,125 @@
+---
+import { getLang } from "../i18n";
+
+const { lang = "en" } = Astro.params;
+const t = getLang(lang);
+---
+
+<section aria-label={t.dyslexicToggle.settings} class="settings">
+  <div>
+    <label class="toggle-switch" for="font-toggle">
+        <input type="checkbox" id="font-toggle" aria-labelledby="toggle-title" role="switch" aria-checked="false"/>
+        <span class="slider"></span>
+    </label>
+  </div>
+  <span class="label-text" id="toggle-title">{t.dyslexicToggle.dyslexicMode}</span>
+  <p>{t.dyslexicToggle.dyslexicModeDisclaimer}</p>
+</section>
+
+<script>
+    window.addEventListener('load', () => {
+        const key = "dyslexic-font";
+        const checkbox = document.getElementById("font-toggle") as HTMLInputElement;
+
+        if (!checkbox){
+            return;
+        }
+
+        // Initialize state from localStorage
+        const isEnabled = localStorage.getItem(key) === "true";
+        if (isEnabled) {
+            document.body.classList.add("dyslexic");
+            checkbox.checked = true;
+            checkbox.setAttribute("aria-checked", "true")
+        }
+
+        checkbox.addEventListener("change", () => {
+            document.body.classList.toggle("dyslexic");
+            const enabled = document.body.classList.contains("dyslexic");
+            localStorage.setItem(key, enabled.toString());
+            checkbox.setAttribute("aria-checked", enabled.toString())
+        });
+    });
+
+</script>
+
+<style>
+.settings {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+@media (max-width: 800px) {
+    .settings {
+        flex-direction: column;
+    }
+}
+
+/* Toggle container */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Hide default checkbox visually while keeping it keyboard-focusable */
+.toggle-switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Show a visible focus ring when the hidden checkbox receives focus */
+.toggle-switch input:focus-visible + .slider {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.75);
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--main-bg-color-light);
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+/* The circle inside slider */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--main-bg-color);
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+
+/* Checked state */
+.toggle-switch input:checked + .slider {
+  background-color: var(--light-bg);
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+/* Label text next to toggle */
+.label-text {
+  font-size: 1rem;
+  user-select: none;
+}
+</style>

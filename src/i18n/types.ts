@@ -26,4 +26,9 @@ export type Translation = {
   footer: {
     copyright: string;
   };
+  dyslexicToggle: {
+    dyslexicMode: string;
+    dyslexicModeDisclaimer: string;
+    settings: string;
+  }
 };

@@ -3,7 +3,7 @@ import { Picture } from "astro:assets";
 import { getLang } from "../i18n";
 import LanguageSelector from "./LanguageSelector.astro";
 
-const { lang = "en" } = Astro.props;
+const { lang = "en" } = Astro.params;
 const t = getLang(lang);
 ---
 <nav class="nav">
@@ -12,19 +12,21 @@ const t = getLang(lang);
             <Picture src="/simon.webp" alt="Simon logo" width={26} height={40} formats={['avif', 'webp']} />
         </a>
     </div>
-    <div><label for="hamburger-icon" class="hamburger">
+    <input class="hamburger-checkbox" type="checkbox" id="hamburger-icon" aria-hidden="true">
+
+    <label for="hamburger-icon" class="hamburger" role="button" tabindex="0" aria-controls="nav-links" aria-expanded="false" aria-label="Menu">
         <svg class="mobileMenuIcon hamburger-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <line x1="3" y1="6" x2="21" y2="6" stroke-width="2" stroke-linecap="round"/>
             <line x1="3" y1="12" x2="21" y2="12" stroke-width="2" stroke-linecap="round"/>
             <line x1="3" y1="18" x2="21" y2="18" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <svg class="mobileMenuIcon hamburger-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+        <svg class="mobileMenuIcon hamburger-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="close">
             <line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"/>
             <line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"/>
         </svg>
-    </label></div>
-    <input type="checkbox" id="hamburger-icon">
-    <div class="nav-links">
+    </label>
+
+    <div id="nav-links" class="nav-links">
         <a href=`/${lang}/#blog`>{t.nav.blog}</a>
         <a href=`/${lang}/#bio`>{t.nav.about}</a>
         <a href=`/${lang}/#projects`>{t.nav.projects}</a>
@@ -77,30 +79,55 @@ const t = getLang(lang);
         align-self: center;
     }
 
-    #hamburger-icon {
-	display: none;
-}
-
-.hamburger {
+    .hamburger {
 	position: absolute;
 	right: 2rem;
 	top: 1rem;
 	width: 3rem;
-	text-align: center;
+	height: 3rem;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.9);
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
-.hamburger i {
-	color: rgba(255, 255, 255, 0.9);
-	font-size: 1.8rem;
-	cursor: pointer;
-}
+	.hamburger:focus-visible {
+		outline: 2px solid var(--soft-white);
+		outline-offset: 2px;
+	}
 
-.hamburger svg {
-	color: rgba(255, 255, 255, 0.9);
-	width: 1.8rem;
-	height: 1.8rem;
-	cursor: pointer;
-}
+	.hamburger svg {
+		width: 1.8rem;
+		height: 1.8rem;
+		color: currentColor;
+	}
+
+	.hamburger-checkbox {
+		display: none;
+	}
+
+	/* checkbox + label + nav: works even if JS is disabled */
+	#hamburger-icon:checked + .hamburger .hamburger-open {
+		display: none;
+	}
+
+    .hamburger-close {
+        display: none;
+    }
+
+	#hamburger-icon:checked + .hamburger .hamburger-close {
+		display: block;
+	}
+
+	#hamburger-icon:checked + .hamburger + .nav-links {
+		display: block;
+		margin-top: 3rem;
+		animation: unfold 0.6s ease-out;
+	}
 
 @media screen and (min-width: 800px) {
 	.hamburger {
@@ -119,6 +146,7 @@ const t = getLang(lang);
 		margin: auto;
 		transform: translateX(-3rem);
 	}
+
 	nav .nav-links a {
 		display: block;
 		padding: 0.9rem 1rem;
@@ -128,11 +156,8 @@ const t = getLang(lang);
 		border-bottom: none;
 	}
 
-	#hamburger-icon:checked + .nav-links {
-		display: block;
-		margin-top: 3rem;
-		animation: unfold 0.6s ease-out;
-	}
+	/* Using the checkbox + label pattern ensures the mobile menu works even when JS is disabled.
+	   JS is only used to keep aria-expanded in sync and enable Enter/Space activation for the label. */
 
 	@keyframes unfold {
 		0% {
@@ -145,24 +170,39 @@ const t = getLang(lang);
 }
 </style>
 
-<script>
-    window.onload = () => {
-        const hamburgerCheckbox = document.querySelector('#hamburger-icon') as HTMLInputElement;
-        const hamburgerOpen = document.querySelector('.hamburger-open') as SVGElement;
-        const hamburgerClose = document.querySelector('.hamburger-close') as SVGElement;
+<script is:inline>
+    window.addEventListener('load', () => {
+        const checkbox = document.querySelector('#hamburger-icon');
+        const toggle = document.querySelector('.hamburger');
 
-        if (!hamburgerCheckbox || !hamburgerOpen || !hamburgerClose) return;
+        if (!checkbox || !toggle) return;
 
-        const toggleIcon = () => {
-            if (hamburgerCheckbox.checked) {
-                hamburgerOpen.style.display = 'none';
-                hamburgerClose.style.display = 'block';
-            } else {
-                hamburgerOpen.style.display = 'block';
-                hamburgerClose.style.display = 'none';
-            }
+        const syncAria = () => {
+            toggle.setAttribute('aria-expanded', String(checkbox.checked));
         };
 
-        hamburgerCheckbox.addEventListener('change', toggleIcon);
-    };
+        syncAria();
+        checkbox.addEventListener('change', syncAria);
+
+        toggle.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkbox.click();
+            }
+        });
+
+        // Close on clicking a nav link
+        document.querySelector('#nav-links')?.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                checkbox.checked = false;
+                syncAria();
+            }
+        });
+
+        // Close on hash navigation
+        window.addEventListener('hashchange', () => {
+            checkbox.checked = false;
+            syncAria();
+        });
+    });
 </script>

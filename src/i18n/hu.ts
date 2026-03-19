@@ -24,6 +24,11 @@ export default {
     balloonDescription: "Emeld fel a léggömböt úgy, hogy háromszor egymás után helyesen különbözteted meg az egymást követő hangok sorrendjét. (Lehetséges, hogy az irányított hangok nem működnek.)"
   },
   footer: {
-    copyright: "- © Simon Júlia 2021 -"
+    copyright: "- © Simon Júlia 2021 -",
+  },
+  dyslexicToggle: {
+    dyslexicMode: "Diszlexia barát szöveg bekapcsolása",
+    dyslexicModeDisclaimer: "A preferenciád a böngésződ helyi tárába kerül mentésre, hogy oldalváltás esetén is megmaradjon. A gomb használatával elfogadod ezt a mentési módot. Erre a honlap üzemeltetője nem lát rá, nem menti más módon. A saját gépeden van.",
+    settings: "Beállítások"
   }
 };

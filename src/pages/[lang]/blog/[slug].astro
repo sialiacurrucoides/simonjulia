@@ -1,13 +1,15 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import Layout from "../../../layouts/Layout.astro";
 import MarkdownLayout from "../../../layouts/MarkdownLayout.astro";
+
+export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
 
   return posts.map((post) => {
-    const [lang, slug] = post.slug.split("/"); // my-post
+    const [lang, slug] = post.id.split("/");
 
     return {
       params: { lang, slug },
@@ -17,8 +19,9 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
-const { lang } = Astro.params;
+const { Content } = await render(post);
+
+const lang = "en";
 ---
 <Layout lang={lang} description={post.data.description}>
   <MarkdownLayout frontmatter={post.data}>
