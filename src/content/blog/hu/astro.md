@@ -56,3 +56,12 @@ Az Astro kíválóan alkalmas olyan oldalak készítésére, ahol sok a statikus
 
 Bár a fentiek alapján levonhatnánk azt a következtetést, hogy csak statikus oldalak esetében használható az Astro, az igazság azonban az, hogy egyre bővül az eszköztára. A dinamikus kollekciókkal, a nemrég bevezetett session-el, a tervezett caching funkciókkal egyre több lehetőséget ad a fejlesztők kezébe. Szerver módban már sok mindent meg lehet csinálni, amit pl. Next.js-el meg lehet.  
 Kíváncsian várom, hogy alakul majd ennek a keretrendszernek a jövője.
+
+<br>
+
+## Néhány további személyes kedvenc jellemző
+
+- Automatizálható a sitemap generálás a "@astrojs/sitemap" segítségével.
+- A hatos verziótól kezdve optimalizálva van a betűtípusok betöltése.
+- A nyelvesítés elég egyszerű az astro:i18n API-val, ráadásul típusozva van.
+- Könnyen beilleszthető a Zod a tartalmak metainformációinak a sematizálásához.
