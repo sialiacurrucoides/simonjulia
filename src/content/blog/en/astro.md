@@ -74,3 +74,12 @@ Based on the above, one might conclude that Astro can only be used for static we
 In server mode, many things can already be implemented that are also possible with Next.js.
 
 I’m curious to see how the future of this framework will unfold.
+
+<br>
+
+## Some additional personal favorite features
+
+- You can automate sitemap generation using "@astrojs/sitemap".
+- Font loading is optimized starting from version 6.
+- Internalization is quite simple with the astro:i18n API, and it is also typed.
+- You can easily integrate Zod to schematize the meta information of your content.

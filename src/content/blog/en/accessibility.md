@@ -5,8 +5,8 @@ date: 2026-03-19
 tags: ["frontend", "UX", "accessibility"]
 ---
 When I heard the 15%-16% (WHO estimate), I was a bit surprised. However, if we think about it, it’s not uncommon for someone to have difficulties with one of their senses or even cognitive functions. For example, many people’s vision deteriorates with age. In such cases, one solution might be to zoom in on the page, but something as small as text not adapting to the screen size can make reading significantly harder. After all, you have to scroll back to the beginning of each line.  
-More serious conditions present from birth or caused by illness are even harder for many to imagine. For example, due to a severe motor dysfunction, a person might only have access to two large buttons to interact with a website. In such cases, it really matters how well the site supports easy navigation.  
-Accessibility is not "edge-case development", it can improve the usage to everyone.  
+More serious conditions present from birth or caused by illness are even harder for many to imagine. For example, due to a severe motor dysfunction, a person might only have access to two large buttons to interact with a website. In such cases, it really matters how well the site supports easy navigation. With accessibility, even those who previously did not have the opportunity to do so can connect to the world.   
+Accessibility is not "edge-case development", it can improve the usage to everyone. Examples include looking at a reflective mobile screen in bright light or when you can only navigate with one hand because the other is busy or damaged.  
 It is also worth knowing as a developer or designer that in the EU, all public sector websites are required to comply with accessibility guidelines ((EU) 2016/2102).
 
 <br>
