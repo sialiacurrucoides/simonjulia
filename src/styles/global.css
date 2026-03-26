@@ -72,6 +72,11 @@ ul {
 h1, h2, h3, h4 {
   color: var(--main-bg-color);
   font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+h1 {
+  margin-bottom: 1rem;
 }
 
 h2 {
