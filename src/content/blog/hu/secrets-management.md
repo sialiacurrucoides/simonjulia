@@ -1,6 +1,6 @@
 ---
 title: "Titkok kezelése (Secrets management)"
-description: "A titokkezelők célja a titkok valóban titok maradjanak, lehetővé téve számunkra, hogy érzékeny információkat egyetlen helyen tároljunk, és különböző engedélyeket adjunk a különböző gépek és emberek számára."
+description: "A titokkezelők célja, hogy a titkok valóban titok maradjanak, lehetővé téve számunkra, hogy érzékeny információkat egyetlen helyen tároljunk, és különböző engedélyeket adjunk a különböző gépek és emberek számára."
 date: 2026-03-26
 tags: ["backend", "security", "DevOps"]
 ---
