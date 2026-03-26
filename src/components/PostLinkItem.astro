@@ -2,6 +2,7 @@
 import DatabaseIcon from "../assets/icons/DatabaseIcon.astro";
 import AstroIcon from "../assets/icons/AstroIcon.astro";
 import AccessibilityIcon from "../assets/icons/Accessibility.astro";
+import SecretsManager from "../assets/icons/SecretsManager.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -9,7 +10,8 @@ const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric',
 const iconList = new Map([
     ["database-fundamentals", DatabaseIcon],
     ["astro", AstroIcon],
-    ["accessibility", AccessibilityIcon]
+    ["accessibility", AccessibilityIcon],
+    ["secrets-management", SecretsManager]
     // Add more mappings as needed
 ]);
 
