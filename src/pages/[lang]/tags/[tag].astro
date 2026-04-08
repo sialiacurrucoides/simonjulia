@@ -32,6 +32,7 @@ const { posts } = Astro.props;
 
 ---
 <Layout lang={lang}>
+  <h1 class="tag-title">{tag}</h1>
   <ul class="post-list">
     {posts.map((article) => <PostLinkItem title={article.data.title} date={article.data.date} slug={article.id.split('/')[1].replace(".md", "")} lang={lang} />)}
   </ul>
