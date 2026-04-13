@@ -11,7 +11,7 @@ const t = getLang(lang);
         <SectionDivider />
         <div class="aboutMe inner-container">
             <div class="aboutText">
-                <h2>{t.nav.about}</h2>
+                <h2 class="aboutTitle">{t.nav.about}</h2>
                 <p>{t.about.degree}</p>
                 <p>{t.about.programmingRoots}</p>
                 <p>{t.about.programmingWhy}</p>
@@ -48,6 +48,10 @@ const t = getLang(lang);
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    .aboutTitle {
+        color: var(--soft-white);
     }
 
     .aboutText {

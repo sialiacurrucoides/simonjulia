@@ -6,6 +6,7 @@
 :root {
   --main-bg-color: #233963;
   --main-bg-color-light: #425883;
+  --main-bg-color-lightest: #899fc9;
   --main-height: 100vh;
   --left-margin: 20%;
   --soft-white: #ccc;

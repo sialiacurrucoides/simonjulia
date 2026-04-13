@@ -4,6 +4,7 @@ import AstroIcon from "../assets/icons/AstroIcon.astro";
 import AccessibilityIcon from "../assets/icons/Accessibility.astro";
 import SecretsManager from "../assets/icons/SecretsManager.astro";
 import DiagramIcon from "../assets/icons/DiagramIcon.astro";
+import GitIcon from "../assets/icons/GitIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -13,7 +14,8 @@ const iconList = new Map([
     ["astro", AstroIcon],
     ["accessibility", AccessibilityIcon],
     ["secrets-management", SecretsManager],
-    ["database-diagrams", DiagramIcon]
+    ["database-diagrams", DiagramIcon],
+    ["git-hooks", GitIcon]
     // Add more mappings as needed
 ]);
 
@@ -55,6 +57,7 @@ const Icon = iconList.get(slug);
     }
 
      .post-link {
+        background-color: var(--light-bg);
         padding: 0.5rem 1rem;
         text-decoration: none;
         color: var(--main-bg-color);
