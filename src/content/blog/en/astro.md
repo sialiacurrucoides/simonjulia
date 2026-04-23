@@ -17,24 +17,24 @@ Astro’s language is a HTML superset, meaning it is essentially enhanced HTML. 
 
 ```
 ---
-    import { Product } from "../types"
-    import { currency } from "../constants"
+import { Product } from "../types"
+import { currency } from "../constants"
 
-    const fruits = ["apple", "pear", "orange"];
+const fruits = ["apple", "pear", "orange"];
 
-    const myProduct: Product = {
-        name: "Test",
-        price: 1000,
-    }
+const myProduct: Product = {
+    name: "Test",
+    price: 1000,
+}
 ---
 
-    <ul>
-        {myList.map((fruit) => (
-            <li>{fruit}</li>
-        ))}
-    </ul>
+<ul>
+    {myList.map((fruit) => (
+        <li>{fruit}</li>
+    ))}
+</ul>
     {myProduct && <p>{myProduct.name} costs {myProduct.price} {currency}</p>}
-    <br>
+<br>
 
 ```
 
@@ -50,7 +50,7 @@ An advantage is that the code required for the chosen framework is not downloade
 
 To handle dynamic parts, Astro introduced the concept of Astro Islands. These are pieces of code where we explicitly indicate that we want more than just static HTML. For this purpose, client directives determine when the JavaScript should be loaded.
 ```
-    <MyReactComponent client:load />
+<MyReactComponent client:load />
 ``` 
 
 <br>

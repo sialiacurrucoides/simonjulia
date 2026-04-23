@@ -12,24 +12,24 @@ Egyszerű, dominánsan statikus oldal készítésénél dilemmában voltam, hogy
 
 ```
 ---
-    import { Product } from "../types"
-    import { currency } from "../constants"
+import { Product } from "../types"
+import { currency } from "../constants"
 
-    const fruits = ["apple", "pear", "orange"];
+const fruits = ["apple", "pear", "orange"];
 
-    const myProduct: Product = {
-        name: "Test",
-        price: 1000,
-    }
+const myProduct: Product = {
+    name: "Test",
+    price: 1000,
+}
 ---
 
-    <ul>
-        {myList.map((fruit) => (
-            <li>{fruit}</li>
-        ))}
-    </ul>
+<ul>
+    {myList.map((fruit) => (
+        <li>{fruit}</li>
+    ))}
+</ul>
     {myProduct && <p>{myProduct.name} costs {myProduct.price} {currency}</p>}
-    <br>
+<br>
 
 ```
 
@@ -41,7 +41,7 @@ Ahogy a fenti példából látható, kapcsos zárójelben használhatunk változ
 
 A dinamikus részek kezeléséhez, az Astro bevezette az __Astro szigetek__ fogalmát. Ezek olyan kódrészletek, ahol explicit jelölni kell, hogy nem csak statikus HTML-t szeretnénk látni és erre vannak a __client direktívák__, hogy mikor történjen meg a JavaScript betöltése.
 ```
-    <MyReactComponent client:load />
+<MyReactComponent client:load />
 ``` 
 
 <br>
