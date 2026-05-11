@@ -6,6 +6,7 @@ import SecretsManager from "../assets/icons/SecretsManager.astro";
 import DiagramIcon from "../assets/icons/DiagramIcon.astro";
 import GitIcon from "../assets/icons/GitIcon.astro";
 import DrizzleIcon from "../assets/icons/DrizzleIcon.astro";
+import Turborepo from "../assets/icons/Turborepo.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -17,7 +18,8 @@ const iconList = new Map([
     ["secrets-management", SecretsManager],
     ["database-diagrams", DiagramIcon],
     ["git-hooks", GitIcon],
-    ["drizzle", DrizzleIcon]
+    ["drizzle", DrizzleIcon],
+    ["turborepo", Turborepo]
     // Add more mappings as needed
 ]);
 
