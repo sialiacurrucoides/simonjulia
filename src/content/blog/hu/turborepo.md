@@ -73,8 +73,11 @@ A Turborepo lokális használata és a local cache ingyenes, csak ha cloud CI-er
 Arra kell odafigyelnünk, hogy mindenképp adjuk meg az __exports__ mezőt, ahol meghatározhatjuk, hogy mely fájlok elérhetőek a felhasználó applikációk számára. Ha egy kis package-ről van szó és mindent elérhetővé teszünk, megadhatjuk a következőképpen:
 ```
 "exports": {
-   "./dist/index.js"
-  },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  }
 ```
 Az új package-nek rendelkeznie kell egy tsconfig.json fájllal is. Ennek egy egyszerű formája a következőképpen nézhet ki:
 ```
@@ -139,6 +142,7 @@ Van pár dolog, amiről érdemes tudni mielőtt elköteleződünk.
 - A deployment folyamatát bonyolíthatja, hogy ugyanabból a repositoryból csak egyetlen alkalmazást szeretnénk kitenni.  
 - A használatához szintén bele kell egy kicsit szokni. Lehet, hogy lokálisan futtatva egy import működik, de csak később derül ki, hogy production módban nem jó, mert például elfelejtettük a releváns package-t függőségként megadni.
 - Kezdőknek szintén okozhat némi fejtörést, hogy átlássák a függőségeket és, hogy milyen konfigurációt hol kell megadni. Például hiába jött létre egy gitignore fájl az újonnan inicializált app-ban, a gyökérkönyvtárban megadott szabályok fognak számítani. Más fontos konfigurációs fájlok is itt találhatóak, így többnyire innen kell indítani a deploy-t is.
+- Monorepo/Turborepo környezetben fontos, hogy minden React-et használó package ugyanazt a React és ReactDOM verziót használja. A shared package-ekben a React-et peerDependency-ként érdemes definiálni vagy minden applikációnál fixálni a React verziót, különben könnyen előfordulhat több React instance betöltése, ami runtime hibákhoz (pl. Invalid hook call) vezethet.
 - Ugyancsak hátrány lehet, hogy a git history bonyolultabbá válik és megnőhet a CI checkout idő.
 - Azt is érdemes szem előtt tartani, hogy minden fejlesztő rálát mindegyik projektre. Ez kisebb csapatoknál előny is lehet, de nagyobb cégnél, ahol rotációban dolgozik sokféle fejlesztő, hátránynak is számíthat.  
 

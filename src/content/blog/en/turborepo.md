@@ -80,7 +80,10 @@ When creating a new package, we should create a `package.json` file and define i
 It is also important to define the __exports__ field, where we specify which files are accessible for consuming applications. If it is a small package and we want to expose everything, it can look like this:
 ```
 "exports": {
-   "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
   },
 ```
 The new package should also contain a tsconfig.json file. A simple version might look like this:
@@ -148,6 +151,7 @@ There are a few things worth considering before fully committing to a monorepo s
 - The deployment process can become more complicated when we only want to deploy a single application from the repository.
 - It also takes some time to get used to the workflow. An import may work locally, but later fail in production because we forgot to declare the relevant package as a dependency.
 - For beginners, understanding dependencies and configuration locations can also be confusing. For example, even if a .gitignore file is created inside a newly initialized app, the rules defined in the root directory will be applied. Other important configuration files are also located there, so deployments are often initiated from the root as well.
+- In a Monorepo/Turborepo environment, it is important that all React-based packages use the same React and ReactDOM versions. In shared packages, React should be defined as a peerDependency, or the React version should be fixed across all applications; otherwise, multiple React instances may be loaded, which can easily lead to runtime errors (e.g. Invalid hook call).
 - Another disadvantage is that Git history can become more complicated and CI checkout times may increase.
 - It is also worth keeping in mind that every developer has visibility into every project. This can be an advantage for smaller teams, but in larger companies with many rotating developers it may also be considered a drawback.
 
