@@ -1,0 +1,48 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'svg'> {}
+
+const props = Astro.props;
+---
+<svg
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Ears -->
+  <circle cx="7" cy="7" r="3" fill="#8B5A2B" />
+  <circle cx="17" cy="7" r="3" fill="#8B5A2B" />
+
+  <!-- Inner ears -->
+  <circle cx="7" cy="7" r="1.4" fill="#5C3A1E" />
+  <circle cx="17" cy="7" r="1.4" fill="#5C3A1E" />
+
+  <!-- Head -->
+  <circle cx="12" cy="13" r="8" fill="#A66A3F" />
+
+  <!-- Snout -->
+  <ellipse cx="12" cy="15" rx="4" ry="3.2" fill="#D9A066" />
+
+  <!-- Eyes -->
+  <circle cx="9.5" cy="12.5" r="0.9" fill="#1A1A1A" />
+  <circle cx="14.5" cy="12.5" r="0.9" fill="#1A1A1A" />
+
+  <!-- Nose -->
+  <ellipse cx="12" cy="14.5" rx="1.2" ry="0.9" fill="#1A1A1A" />
+
+  <!-- Mouth -->
+  <path
+    d="M12 15.3V17
+       M12 17
+       C11.5 17.7 10.7 18 10 18
+       M12 17
+       C12.5 17.7 13.3 18 14 18"
+    stroke="#1A1A1A"
+    stroke-width="0.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
