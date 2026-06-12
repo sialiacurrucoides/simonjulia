@@ -1,0 +1,22 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'svg'> {}
+
+const props = Astro.props;
+---
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 24"
+     width="64"
+     height="24"
+     aria-label="O11Y"
+     role="img">
+  <text x="0"
+        y="22"
+        font-family="system-ui, sans-serif"
+        font-size="28"
+        font-weight="800"
+        fill="currentColor">
+    O11Y
+  </text>
+</svg>
