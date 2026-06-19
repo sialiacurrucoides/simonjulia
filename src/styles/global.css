@@ -76,6 +76,10 @@ h1, h2, h3, h4 {
   margin-top: 0.5rem;
 }
 
+a {
+    color: var(--main-bg-color);
+}
+
 h1 {
   margin-bottom: 1rem;
 }
@@ -108,6 +112,11 @@ h4 {
 
 .diagram2 img {
   max-height: 280px;
+  width: auto;
+}
+
+.diagram3 img {
+  max-height: 360px;
   width: auto;
 }
 
