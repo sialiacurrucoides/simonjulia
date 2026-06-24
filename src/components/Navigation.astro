@@ -170,10 +170,10 @@ const t = getLang(lang);
 }
 </style>
 
-<script is:inline>
+<script>
     window.addEventListener('load', () => {
-        const checkbox = document.querySelector('#hamburger-icon');
-        const toggle = document.querySelector('.hamburger');
+        const checkbox = document.querySelector('#hamburger-icon') as HTMLInputElement | null;
+        const toggle = document.querySelector('.hamburger') as HTMLElement | null;
 
         if (!checkbox || !toggle) return;
 
@@ -193,7 +193,7 @@ const t = getLang(lang);
 
         // Close on clicking a nav link
         document.querySelector('#nav-links')?.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
+            if (e.target instanceof Element && e.target.tagName === 'A') {
                 checkbox.checked = false;
                 syncAria();
             }

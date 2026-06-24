@@ -1,6 +1,9 @@
-import type { BlogArticle } from "../content/config";
-
 export type Article = {
     file: string;
-    frontmatter: BlogArticle;
+    frontmatter: {
+        title: string;
+        description: string;
+        date: string;
+        tags: string[];
+    };
 }
