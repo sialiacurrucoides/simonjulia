@@ -98,6 +98,9 @@ h4 {
 
 .github-dark {
   padding: 1rem;
+  background-color: #24292e;
+  color: #e1e4e8;
+  overflow-x: auto;
 }
 
 .diagram, .diagram2 {

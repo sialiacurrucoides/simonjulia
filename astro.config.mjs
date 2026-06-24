@@ -19,6 +19,21 @@ export default defineConfig({
           weights:[400, 700]
       }
 ],
-  site: 'https://simonjulia.hu/',
-  integrations: [sitemap()]
+site: 'https://simonjulia.hu/',
+integrations: [sitemap()],
+security: {
+    csp: {
+      // Astro auto-adds hashes for its own inline scripts/styles.
+      // Add directives it doesn't manage:
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "connect-src 'self'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ],
+    },
+  },
 });
