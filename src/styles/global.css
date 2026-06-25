@@ -123,6 +123,13 @@ h4 {
   width: auto;
 }
 
+@media screen and (max-width: 600px) {
+  .diagram3 img {
+    max-height: none;
+    width: 100%;
+  }
+}
+
 .tag-title {
   text-align: center;
   margin: 2rem;

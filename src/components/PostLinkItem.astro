@@ -13,6 +13,7 @@ import ZustandIcon from "../assets/icons/ZustandIcon.astro";
 import PlaywrightIcon from "../assets/icons/PlaywrightIcon.astro";
 import ObservabilityIcon from "../assets/icons/ObservabilityIcon.astro";
 import OTPAuthIcon from "../assets/icons/OTPAuthIcon.astro";
+import ShieldIcon from "../assets/icons/ShieldIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -31,7 +32,8 @@ const iconList = new Map([
     ["zustand", ZustandIcon],
     ["playwright", PlaywrightIcon],
     ["observability", ObservabilityIcon],
-    ["mfa", OTPAuthIcon]
+    ["mfa", OTPAuthIcon],
+    ["csp", ShieldIcon]
     // Add more mappings as needed
 ]);
 

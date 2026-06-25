@@ -65,3 +65,4 @@ Kíváncsian várom, hogy alakul majd ennek a keretrendszernek a jövője.
 - A hatos verziótól kezdve optimalizálva van a betűtípusok betöltése.
 - A nyelvesítés elég egyszerű az astro:i18n API-val, ráadásul típusozva van.
 - Könnyen beilleszthető a Zod a tartalmak metainformációinak a sematizálásához.
+- Könnyed CSP beállítás a config segítségével, automatikus hash (csak ne felejtsük el, hogy ez meta tag beállítás).

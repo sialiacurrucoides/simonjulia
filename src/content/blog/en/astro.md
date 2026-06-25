@@ -83,3 +83,4 @@ I’m curious to see how the future of this framework will unfold.
 - Font loading is optimized starting from version 6.
 - Internalization is quite simple with the astro:i18n API, and it is also typed.
 - You can easily integrate Zod to schematize the meta information of your content.
+- Easy CSP configuration with config, automatic hash (just don't forget that this is a meta tag setting).
