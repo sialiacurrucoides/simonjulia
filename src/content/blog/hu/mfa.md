@@ -102,4 +102,6 @@ Mi mitől véd?
 
 <br>
 
-Izgalmas idő előtt állunk, ami azzal az ígérettel kecsegtet, hogy nem kell többet jelszavak miatt aggódnunk. A Passkey lehetősége lelkesíti a szakembereket, de az átmenet még közel sem gyors. Ezért érdemes tisztában lennünk a különböző megoldások előnyeivel és hátrányaival. Sok olyan részlet van, ami miatt a tanulást nem érdemes abbahagyni.
+Izgalmas idő előtt állunk, ami azzal az ígérettel kecsegtet, hogy nem kell többet jelszavak miatt aggódnunk. A Passkey lehetősége lelkesíti a szakembereket, de az átmenet még közel sem gyors. Ezért érdemes tisztában lennünk a különböző megoldások előnyeivel és hátrányaival.  
+Egyik kihívás a felhasználók megfelelő informálása, mert amit nem értenek, azzal inkább nem foglalkoznak. A másik probléma, hogy ha a privát kulcs elveszik, akkor nem triviális a fiók visszaállításának kérdése. Ha mi nem olyan nagy vállalat vagyunk, mint például az Apple, amely ehhez elég sokat tud a felhasználóiról, valószínűleg az a megoldás, hogy a passkey csak lehetséges belépési mód, de regisztráláshoz megtartjuk a jelszót vagy a szolgáltatón keresztüli (pl. Google) bejelentkezést. Tehát az ezekkel kapcsolatos biztonsági kockázatokra továbbra is oda kell figyelni.  
+Ezen kívül is sok olyan részlet van, ami miatt a tanulást nem érdemes abbahagyni.  

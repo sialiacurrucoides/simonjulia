@@ -164,4 +164,6 @@ Protect Against
 
 We are entering an exciting era in which passwords may eventually become far less important than they are today. Passkeys have generated significant enthusiasm within the security community, but adoption is still progressing gradually.
 
+One challenge is properly informing users, since people tend not to engage with what they don't understand. Another problem is that if the private key is lost, account recovery is far from straightforward. If we're not as large a company as, say, Apple — which knows enough about its users to make that work — the more realistic solution is probably to offer the passkey only as an optional login method, while still keeping password-based or provider-based (e.g. Google) login available for registration. So the security risks tied to these trade-offs still need ongoing attention.
+
 Understanding the strengths and weaknesses of different authentication methods helps us make better security decisions, whether we are building applications or simply using them. Authentication is evolving rapidly, and there is always more to learn.
