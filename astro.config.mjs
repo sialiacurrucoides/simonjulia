@@ -21,6 +21,13 @@ export default defineConfig({
 ],
 site: 'https://simonjulia.hu/',
 integrations: [sitemap()],
+markdown: {
+  // Shiki highlights tokens with inline `style="color:..."` attributes, which
+  // CSP hash/nonce sources can't cover (they only apply to <style> elements,
+  // not style attributes). Prism highlights via CSS classes instead, so a
+  // self-hosted stylesheet (see Layout.astro) handles it without 'unsafe-hashes'.
+  syntaxHighlight: 'prism',
+},
 security: {
     csp: {
       // Astro auto-adds hashes for its own inline scripts/styles.
