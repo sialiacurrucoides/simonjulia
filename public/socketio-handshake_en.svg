@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">How Socket.IO establishes a connection</title>
+  <desc id="d">The client first performs an HTTP handshake. If the server can upgrade it, the connection switches to a persistent WebSocket. If not, Socket.IO falls back to repeated HTTP long-polling requests.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1D9E75"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#D97706"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="420" fill="url(#bg)"/>
+
+  <text x="450" y="38" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">How the Connection Upgrades</text>
+  <text x="450" y="61" text-anchor="middle" font-size="15" fill="#64748b">An HTTP handshake first — WebSocket if it succeeds, polling if it doesn't</text>
+
+  <!-- ============ CARD 1: HANDSHAKE ============ -->
+  <g transform="translate(50,155)">
+    <rect width="260" height="170" rx="16" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <circle cx="44" cy="40" r="22" fill="#475569"/>
+    <path d="M-9,-5 H5 M2,-9 L9,-5 L2,-1" transform="translate(44,40)" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M9,5 H-5 M-2,9 L-9,5 L-2,1" transform="translate(44,40)" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="37" font-size="17" font-weight="700" fill="#334155" letter-spacing="0.3">HTTP HANDSHAKE</text>
+    <text x="30" y="83" font-size="13.5" fill="#475569" font-family="ui-monospace, monospace">GET /socket.io/?EIO=4</text>
+    <text x="30" y="102" font-size="13.5" fill="#475569" font-family="ui-monospace, monospace">Upgrade: websocket</text>
+    <text x="30" y="132" font-size="13.5" fill="#475569">Client asks the server to</text>
+    <text x="30" y="150" font-size="13.5" fill="#475569">upgrade the connection.</text>
+  </g>
+
+  <!-- ============ ARROWS ============ -->
+  <path d="M310,240 C365,240 385,200 430,160" fill="none" stroke="#1D9E75" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <text x="345" y="190" font-size="12.5" fill="#1D9E75" font-weight="600">upgrade OK</text>
+  <path d="M310,240 C365,240 385,280 430,320" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#arrowAmber)"/>
+  <text x="335" y="297" font-size="12.5" fill="#D97706" font-weight="600">no upgrade</text>
+
+  <!-- ============ CARD 2: UPGRADED (WEBSOCKET) ============ -->
+  <g transform="translate(430,90)">
+    <rect width="280" height="140" rx="16" fill="#E1F5EE" stroke="#9FE1CB"/>
+    <circle cx="32" cy="32" r="18" fill="#1D9E75"/>
+    <path d="M-6,0 L-2,4 L6,-5" transform="translate(32,32)" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="60" y="29" font-size="17" font-weight="700" fill="#0F6E56">UPGRADED</text>
+    <text x="60" y="47" font-size="13.5" fill="#0F6E56" font-family="ui-monospace, monospace">101 Switching Protocols</text>
+    <text x="30" y="78" font-size="13.5" fill="#085041">Persistent WebSocket</text>
+    <text x="30" y="96" font-size="13.5" fill="#085041">connection for real-time data.</text>
+  </g>
+
+  <!-- ============ CARD 3: FALLBACK (LONG-POLLING) ============ -->
+  <g transform="translate(430,250)">
+    <rect width="280" height="140" rx="16" fill="#FFF7E0" stroke="#FBD98A"/>
+    <circle cx="32" cy="32" r="18" fill="#D97706"/>
+    <path d="M -6,-7 A 9,9 0 1 1 -8,4" transform="translate(32,32)" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M -8,4 L -12,1 M -8,4 L -5,-1" transform="translate(32,32)" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="60" y="29" font-size="17" font-weight="700" fill="#92400E">FALLBACK</text>
+    <text x="60" y="47" font-size="13.5" fill="#92400E" font-family="ui-monospace, monospace">HTTP long-polling</text>
+    <text x="30" y="78" font-size="13.5" fill="#78350F">No persistent connection —</text>
+    <text x="30" y="96" font-size="13.5" fill="#78350F">keeps re-requesting over HTTP.</text>
+  </g>
+</svg>

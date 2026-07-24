@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 630" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Adatáramlás Socket.IO-val</title>
+  <desc id="d">Az üzenet végighalad a JavaScript, Socket.IO, WebSocket, Node, write(), kernel socket, TCP, IP, Ethernet és hálózati kártya rétegeken, átkel az interneten, majd ugyanazon a tükrözött rétegsoron visszajut a JavaScript callback-ig.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="gSend" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="340" y2="90">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="gRecv" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="340" y2="90">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="gNet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#475569"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#1e293b" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+  <path id="arrowDownSmall" d="M-1.5,-6 H1.5 V1 H4.5 L0,7 L-4.5,1 H-1.5 Z"/>
+  <path id="arrowUpSmall" d="M-1.5,6 H1.5 V-1 H4.5 L0,-7 L-4.5,-1 H-1.5 Z"/>
+  </defs>
+
+  <rect width="900" height="630" fill="url(#bg)"/>
+
+  <text x="450" y="46" text-anchor="middle" font-size="27" font-weight="700" fill="#0f172a">Adatáramlás Socket.IO-val</text>
+
+  <!-- ============ KÜLDÉS KÁRTYA ============ -->
+  <g transform="translate(60,80)">
+    <rect width="340" height="476" rx="18" fill="#ffffff" filter="url(#shadow)"/>
+    <rect width="340" height="90" rx="18" fill="url(#gSend)"/>
+    <rect y="68" width="340" height="22" fill="url(#gSend)"/>
+    <circle cx="170" cy="42" r="26" fill="#ffffff"/>
+    <path transform="translate(170,42)" d="M-3,-14 L3,-14 L3,3 L9,3 L0,15 L-9,3 L-3,3 Z" fill="#2563eb"/>
+    <text x="170" y="119" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="0.5">KÜLDÉS</text>
+    <line x1="30" y1="134" x2="310" y2="134" stroke="#e2e8f0" stroke-width="2"/>
+
+    <g fill="#334155" font-size="17">
+      <use href="#arrowDownSmall" x="44" y="157" fill="#3b82f6"/><text x="64" y="163">JavaScript</text>
+      <use href="#arrowDownSmall" x="44" y="189" fill="#3b82f6"/><text x="64" y="195">Socket.IO</text>
+      <use href="#arrowDownSmall" x="44" y="221" fill="#3b82f6"/><text x="64" y="227">WebSocket</text>
+      <use href="#arrowDownSmall" x="44" y="253" fill="#3b82f6"/><text x="64" y="259">Node.js</text>
+      <use href="#arrowDownSmall" x="44" y="285" fill="#3b82f6"/><text x="64" y="291" font-family="ui-monospace, monospace">write()</text>
+      <use href="#arrowDownSmall" x="44" y="317" fill="#3b82f6"/><text x="64" y="323">Kernel socket</text>
+      <use href="#arrowDownSmall" x="44" y="349" fill="#3b82f6"/><text x="64" y="355">TCP</text>
+      <use href="#arrowDownSmall" x="44" y="381" fill="#3b82f6"/><text x="64" y="387">IP</text>
+      <use href="#arrowDownSmall" x="44" y="413" fill="#3b82f6"/><text x="64" y="419">Ethernet</text>
+      <use href="#arrowDownSmall" x="44" y="445" fill="#3b82f6"/><text x="64" y="451">Hálózati kártya</text>
+    </g>
+  </g>
+
+  <!-- ============ FOGADÁS KÁRTYA ============ -->
+  <g transform="translate(500,80)">
+    <rect width="340" height="476" rx="18" fill="#ffffff" filter="url(#shadow)"/>
+    <rect width="340" height="90" rx="18" fill="url(#gRecv)"/>
+    <rect y="68" width="340" height="22" fill="url(#gRecv)"/>
+    <circle cx="170" cy="42" r="26" fill="#ffffff"/>
+    <path transform="translate(170,42)" d="M-3,14 L3,14 L3,-3 L9,-3 L0,-15 L-9,-3 L-3,-3 Z" fill="#059669"/>
+    <text x="170" y="119" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="0.5">FOGADÁS</text>
+    <line x1="30" y1="134" x2="310" y2="134" stroke="#e2e8f0" stroke-width="2"/>
+
+    <g fill="#334155" font-size="17">
+      <use href="#arrowUpSmall" x="44" y="157" fill="#10b981"/><text x="64" y="163">JavaScript callback</text>
+      <use href="#arrowUpSmall" x="44" y="189" fill="#10b981"/><text x="64" y="195">Socket.IO</text>
+      <use href="#arrowUpSmall" x="44" y="221" fill="#10b981"/><text x="64" y="227">WebSocket</text>
+      <use href="#arrowUpSmall" x="44" y="253" fill="#10b981"/><text x="64" y="259">Node.js</text>
+      <use href="#arrowUpSmall" x="44" y="285" fill="#10b981"/><text x="64" y="291" font-family="ui-monospace, monospace">read()</text>
+      <use href="#arrowUpSmall" x="44" y="317" fill="#10b981"/><text x="64" y="323">Kernel socket</text>
+      <use href="#arrowUpSmall" x="44" y="349" fill="#10b981"/><text x="64" y="355">TCP</text>
+      <use href="#arrowUpSmall" x="44" y="381" fill="#10b981"/><text x="64" y="387">IP</text>
+      <use href="#arrowUpSmall" x="44" y="413" fill="#10b981"/><text x="64" y="419">Ethernet</text>
+      <use href="#arrowUpSmall" x="44" y="445" fill="#10b981"/><text x="64" y="451">Hálózati kártya</text>
+    </g>
+  </g>
+
+  <!-- ============ INTERNET HÍD ============ -->
+  <path d="M230,556 C230,578 300,594 365,594" fill="none" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M535,594 C600,594 670,578 670,556" fill="none" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="365" y="574" width="170" height="42" rx="21" fill="url(#gNet)"/>
+  <text x="450" y="600" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff" letter-spacing="1">INTERNET</text>
+</svg>

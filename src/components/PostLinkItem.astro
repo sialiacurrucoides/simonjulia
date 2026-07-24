@@ -15,6 +15,7 @@ import ObservabilityIcon from "../assets/icons/ObservabilityIcon.astro";
 import OTPAuthIcon from "../assets/icons/OTPAuthIcon.astro";
 import ShieldIcon from "../assets/icons/ShieldIcon.astro";
 import OfflineIcon from "../assets/icons/OfflineIcon.astro";
+import SockerIoIcon from "../assets/icons/SockerIoIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -35,7 +36,8 @@ const iconList = new Map([
     ["observability", ObservabilityIcon],
     ["mfa", OTPAuthIcon],
     ["csp", ShieldIcon],
-    ["offline-support", OfflineIcon]
+    ["offline-support", OfflineIcon],
+    ["socketio", SockerIoIcon]
     // Add more mappings as needed
 ]);
 
