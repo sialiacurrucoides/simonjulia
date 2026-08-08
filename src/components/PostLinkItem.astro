@@ -16,6 +16,7 @@ import OTPAuthIcon from "../assets/icons/OTPAuthIcon.astro";
 import ShieldIcon from "../assets/icons/ShieldIcon.astro";
 import OfflineIcon from "../assets/icons/OfflineIcon.astro";
 import SockerIoIcon from "../assets/icons/SockerIoIcon.astro";
+import GrafanaIcon from "../assets/icons/GrafanaIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -37,7 +38,8 @@ const iconList = new Map([
     ["mfa", OTPAuthIcon],
     ["csp", ShieldIcon],
     ["offline-support", OfflineIcon],
-    ["socketio", SockerIoIcon]
+    ["socketio", SockerIoIcon],
+    ["grafana", GrafanaIcon]
     // Add more mappings as needed
 ]);
 

@@ -120,6 +120,22 @@ h4 {
   .diagram3 img {
     max-height: none;
     width: 100%;
+    height: auto;
+  }
+}
+
+/* grafana.md uses two differently-proportioned screenshots (desktop 3018x1136,
+   mobile 752x1254) behind the same <picture>/<source> element, so the shared
+   .diagram3 rules above can't express a single correct ratio for both. Pin the
+   real ratio per breakpoint here instead of relying on the img's width/height
+   attributes (which only describe the desktop image). */
+.grafanaDiagram img {
+  aspect-ratio: 3018 / 1136;
+}
+
+@media screen and (max-width: 600px) {
+  .grafanaDiagram img {
+    aspect-ratio: 752 / 1254;
   }
 }
 
