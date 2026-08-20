@@ -17,6 +17,7 @@ import ShieldIcon from "../assets/icons/ShieldIcon.astro";
 import OfflineIcon from "../assets/icons/OfflineIcon.astro";
 import SockerIoIcon from "../assets/icons/SockerIoIcon.astro";
 import GrafanaIcon from "../assets/icons/GrafanaIcon.astro";
+import NestjsIcon from "../assets/icons/NestjsIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -39,7 +40,8 @@ const iconList = new Map([
     ["csp", ShieldIcon],
     ["offline-support", OfflineIcon],
     ["socketio", SockerIoIcon],
-    ["grafana", GrafanaIcon]
+    ["grafana", GrafanaIcon],
+    ["nestjs-di", NestjsIcon]
     // Add more mappings as needed
 ]);
 
