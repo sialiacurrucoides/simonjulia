@@ -6,12 +6,14 @@ import "../styles/global.css";
 
 interface Props {
   lang?: string;
+  title?: string;
   description?: string;
 }
 
-const { lang = "en", description } = Astro.props as Props;
+const { lang = "en", title, description } = Astro.props as Props;
 const t = getLang(lang);
 
+const pageTitle = title || "Simon Júlia - Web developer";
 const metaDescription = description || t.metaDescription;
 ---
 
@@ -19,7 +21,7 @@ const metaDescription = description || t.metaDescription;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simon Júlia - Web developer</title>
+    <title>{pageTitle}</title>
     <meta name="description" content={metaDescription} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="stylesheet" href="/styles/prism-theme.css" />

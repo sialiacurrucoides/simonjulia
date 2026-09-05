@@ -1,0 +1,902 @@
+[
+  {
+    "question": "Which keyword retrieves rows from a table in SQL?",
+    "a": "RETRIEVE",
+    "b": "FETCH",
+    "c": "SELECT",
+    "d": "GET",
+    "correctAnswer": "c",
+    "explanation": "SELECT is the standard statement used to query data from one or more tables."
+  },
+  {
+    "question": "What does `SELECT DISTINCT city FROM customers;` return?",
+    "a": "Cities sorted alphabetically",
+    "b": "Every row, unmodified",
+    "c": "Only unique city values",
+    "d": "The number of distinct cities",
+    "correctAnswer": "c",
+    "explanation": "DISTINCT removes duplicate rows from the result set, leaving only unique values of the selected column(s)."
+  },
+  {
+    "question": "Which clause restricts the number of rows a query returns in PostgreSQL?",
+    "a": "ROWNUM <= 10",
+    "b": "LIMIT 10",
+    "c": "TOP 10",
+    "d": "MAX_ROWS 10",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL uses LIMIT (and optionally OFFSET) to cap the number of returned rows. TOP is SQL Server syntax and ROWNUM is Oracle's."
+  },
+  {
+    "question": "How do you give the column `first_name` the alias `name` in a SELECT list?",
+    "a": "first_name AS name",
+    "b": "first_name TO name",
+    "c": "first_name = name",
+    "d": "name = first_name",
+    "correctAnswer": "a",
+    "explanation": "AS assigns an alias to a column or expression; the AS keyword can even be omitted (`first_name name`)."
+  },
+  {
+    "question": "Which operator concatenates two strings in PostgreSQL?",
+    "a": "||",
+    "b": "CONCAT_WS",
+    "c": "&",
+    "d": "+",
+    "correctAnswer": "a",
+    "explanation": "PostgreSQL uses the || operator for string concatenation, e.g. 'Sim' || 'on'. CONCAT() is a function alternative, not an operator."
+  },
+  {
+    "question": "What is the purpose of the WHERE clause?",
+    "a": "To rename columns",
+    "b": "To sort the result set",
+    "c": "To group rows into summary rows",
+    "d": "To filter rows before grouping",
+    "correctAnswer": "d",
+    "explanation": "WHERE filters individual rows based on a condition, evaluated before any GROUP BY aggregation happens."
+  },
+  {
+    "question": "Which query correctly selects customers whose age is between 18 and 30 inclusive?",
+    "a": "SELECT * FROM customers WHERE age BETWEEN 18 AND 30;",
+    "b": "SELECT * FROM customers WHERE age > 18 AND age < 30;",
+    "c": "SELECT * FROM customers WHERE age = 18..30;",
+    "d": "SELECT * FROM customers WHERE age IN (18, 30);",
+    "correctAnswer": "a",
+    "explanation": "BETWEEN x AND y is inclusive of both endpoints in PostgreSQL, matching age >= 18 AND age <= 30."
+  },
+  {
+    "question": "Which operator checks whether a value matches any value in a list?",
+    "a": "IN",
+    "b": "LIKE",
+    "c": "EXISTS",
+    "d": "ANY",
+    "correctAnswer": "a",
+    "explanation": "IN (val1, val2, ...) tests whether a value equals any of the listed values, a shorthand for chained OR/= comparisons."
+  },
+  {
+    "question": "What does `SELECT * FROM products WHERE name LIKE 'A%';` match?",
+    "a": "Names containing an 'A' anywhere",
+    "b": "Names exactly equal to 'A'",
+    "c": "Names starting with 'A'",
+    "d": "Names ending with 'A'",
+    "correctAnswer": "c",
+    "explanation": "In a LIKE pattern, % matches any sequence of characters, so 'A%' matches any string starting with 'A'."
+  },
+  {
+    "question": "What is the case-insensitive equivalent of LIKE in PostgreSQL?",
+    "a": "SIMILAR TO",
+    "b": "MATCH",
+    "c": "LIKE CI",
+    "d": "ILIKE",
+    "correctAnswer": "d",
+    "explanation": "ILIKE performs a case-insensitive pattern match; it is a PostgreSQL extension not found in standard SQL."
+  },
+  {
+    "question": "Which clause sorts the result set of a query?",
+    "a": "SORT BY",
+    "b": "ARRANGE BY",
+    "c": "GROUP BY",
+    "d": "ORDER BY",
+    "correctAnswer": "d",
+    "explanation": "ORDER BY specifies the sort order of the returned rows, ascending by default."
+  },
+  {
+    "question": "By default, in what order does `ORDER BY price` sort rows?",
+    "a": "Ascending",
+    "b": "Insertion order",
+    "c": "Descending",
+    "d": "Random",
+    "correctAnswer": "a",
+    "explanation": "ASC is the implicit default sort direction in PostgreSQL when no direction is specified."
+  },
+  {
+    "question": "How do you sort results by `price` from highest to lowest?",
+    "a": "ORDER BY price REVERSE",
+    "b": "ORDER BY price DESC",
+    "c": "ORDER BY price DESCENDING",
+    "d": "SORT price DOWN",
+    "correctAnswer": "b",
+    "explanation": "DESC after the column name sorts in descending order."
+  },
+  {
+    "question": "Where do NULL values appear by default when sorting ascending in PostgreSQL?",
+    "a": "They are excluded",
+    "b": "First",
+    "c": "Randomly placed",
+    "d": "Last",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL's default is NULLS LAST for ASC order and NULLS FIRST for DESC order, unless overridden explicitly."
+  },
+  {
+    "question": "Which clause would you add to force NULLs to sort first regardless of direction?",
+    "a": "ORDER BY col NULLS FIRST",
+    "b": "ORDER BY col NULL TOP",
+    "c": "ORDER BY ISNULL(col) DESC",
+    "d": "WHERE col IS NULL FIRST",
+    "correctAnswer": "a",
+    "explanation": "PostgreSQL supports explicit NULLS FIRST / NULLS LAST modifiers on ORDER BY expressions."
+  },
+  {
+    "question": "How do you sort first by `country` ascending, then by `city` descending?",
+    "a": "ORDER BY country, DESC city",
+    "b": "ORDER BY country, city DESC",
+    "c": "ORDER BY (country, city) DESC",
+    "d": "ORDER BY country ASC AND city DESC",
+    "correctAnswer": "b",
+    "explanation": "Each column in an ORDER BY list can have its own direction; only `city` gets DESC here, `country` keeps the default ASC."
+  },
+  {
+    "question": "What does `LIMIT 10 OFFSET 20` do?",
+    "a": "Skips 20 rows, then returns the next 10",
+    "b": "Returns rows 1-10",
+    "c": "Returns the 20th and 10th rows only",
+    "d": "Returns rows 20-30",
+    "correctAnswer": "a",
+    "explanation": "OFFSET skips a number of rows before LIMIT starts counting, so this returns rows 21 through 30 (assuming a stable ORDER BY)."
+  },
+  {
+    "question": "Why is LIMIT/OFFSET without an ORDER BY considered risky?",
+    "a": "Row order is not guaranteed, so pagination results can be inconsistent between runs",
+    "b": "PostgreSQL does not support OFFSET without ORDER BY",
+    "c": "It always throws an error",
+    "d": "It only works on indexed tables",
+    "correctAnswer": "a",
+    "explanation": "Without ORDER BY, the database is free to return rows in any physical order, so paging can produce duplicate or missing rows across queries."
+  },
+  {
+    "question": "Which JOIN returns only rows that have matching values in both tables?",
+    "a": "FULL JOIN",
+    "b": "INNER JOIN",
+    "c": "RIGHT JOIN",
+    "d": "LEFT JOIN",
+    "correctAnswer": "b",
+    "explanation": "INNER JOIN (the default JOIN type) returns only rows where the join condition matches in both tables."
+  },
+  {
+    "question": "Which JOIN keeps all rows from the left table, filling unmatched right-side columns with NULL?",
+    "a": "CROSS JOIN",
+    "b": "RIGHT JOIN",
+    "c": "INNER JOIN",
+    "d": "LEFT JOIN",
+    "correctAnswer": "d",
+    "explanation": "LEFT JOIN (or LEFT OUTER JOIN) preserves every row from the left table, using NULLs where there is no matching right-side row."
+  },
+  {
+    "question": "What does a CROSS JOIN between a 3-row table and a 4-row table produce?",
+    "a": "4 rows",
+    "b": "12 rows",
+    "c": "7 rows",
+    "d": "3 rows",
+    "correctAnswer": "b",
+    "explanation": "CROSS JOIN produces the Cartesian product: every row of the first table paired with every row of the second, so 3 x 4 = 12 rows."
+  },
+  {
+    "question": "What is required to perform an INNER JOIN in PostgreSQL?",
+    "a": "An index on every joined column",
+    "b": "Both tables must have identical schemas",
+    "c": "A join condition, typically via ON or USING",
+    "d": "The tables must be in the same schema",
+    "correctAnswer": "c",
+    "explanation": "A join condition (ON clause, or USING for identically named columns) tells PostgreSQL how to match rows between the two tables."
+  },
+  {
+    "question": "What's the difference between `JOIN ... ON a.id = b.id` and `JOIN ... USING (id)`?",
+    "a": "USING requires the column to have the same name in both tables and only outputs it once",
+    "b": "USING is invalid syntax in PostgreSQL",
+    "c": "There is no difference",
+    "d": "ON is faster than USING",
+    "correctAnswer": "a",
+    "explanation": "USING(col) is shorthand for equi-joins on a same-named column, and it collapses the column into a single output column instead of duplicating it."
+  },
+  {
+    "question": "Which JOIN would you use to see every customer along with any orders they may or may not have placed?",
+    "a": "RIGHT JOIN customers",
+    "b": "CROSS JOIN orders",
+    "c": "INNER JOIN orders",
+    "d": "LEFT JOIN orders",
+    "correctAnswer": "d",
+    "explanation": "LEFT JOIN from customers to orders keeps every customer row even when there is no matching order, showing NULLs for order columns."
+  },
+  {
+    "question": "A self-join is:",
+    "a": "A join that always fails",
+    "b": "Only possible with recursive CTEs",
+    "c": "A table joined to itself, typically using aliases to distinguish the two references",
+    "d": "A join with no ON clause",
+    "correctAnswer": "c",
+    "explanation": "A self-join joins a table to itself, useful for comparing rows within the same table (e.g. employees to their managers); it requires two aliases to disambiguate columns."
+  },
+  {
+    "question": "What does `SELECT COUNT(*) FROM orders;` return?",
+    "a": "The number of rows in orders",
+    "b": "The number of distinct customers",
+    "c": "The sum of all order totals",
+    "d": "An error, because COUNT needs a column name",
+    "correctAnswer": "a",
+    "explanation": "COUNT(*) counts all rows, including those with NULL values in every column, unlike COUNT(column) which skips NULLs in that column."
+  },
+  {
+    "question": "What is the difference between COUNT(*) and COUNT(column_name)?",
+    "a": "COUNT(column_name) also counts NULL values in that column",
+    "b": "COUNT(column_name) skips rows where column_name is NULL",
+    "c": "No difference",
+    "d": "COUNT(*) is slower in every case",
+    "correctAnswer": "b",
+    "explanation": "COUNT(column) only counts rows where that column is non-NULL, while COUNT(*) counts every row regardless of NULLs."
+  },
+  {
+    "question": "Which function computes the arithmetic mean of a numeric column?",
+    "a": "SUM() / COUNT()",
+    "b": "MEDIAN()",
+    "c": "MEAN()",
+    "d": "AVG()",
+    "correctAnswer": "d",
+    "explanation": "AVG() is the built-in aggregate function for the arithmetic mean; option d would also work manually but AVG() is the direct tool."
+  },
+  {
+    "question": "What does GROUP BY do?",
+    "a": "Sorts rows by the grouped column",
+    "b": "Collapses rows sharing the same values in the grouped columns into summary rows",
+    "c": "Removes duplicate rows only",
+    "d": "Filters rows before aggregation",
+    "correctAnswer": "b",
+    "explanation": "GROUP BY partitions rows into groups sharing equal values in the specified columns, so aggregate functions compute one result per group."
+  },
+  {
+    "question": "Why does `SELECT department, name, COUNT(*) FROM employees GROUP BY department;` fail in PostgreSQL?",
+    "a": "It doesn't fail; PostgreSQL picks an arbitrary name per group",
+    "b": "GROUP BY cannot be combined with COUNT()",
+    "c": "COUNT(*) requires a WHERE clause",
+    "d": "`name` is not in the GROUP BY list and is not aggregated",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL enforces that every selected column must either appear in GROUP BY or be wrapped in an aggregate function; `name` is neither here."
+  },
+  {
+    "question": "How do you filter groups after aggregation, e.g. only departments with more than 5 employees?",
+    "a": "GROUP BY COUNT(*) > 5",
+    "b": "FILTER COUNT(*) > 5",
+    "c": "HAVING COUNT(*) > 5",
+    "d": "WHERE COUNT(*) > 5",
+    "correctAnswer": "c",
+    "explanation": "HAVING filters groups after GROUP BY/aggregation has run, whereas WHERE filters individual rows before grouping and cannot reference aggregate results directly."
+  },
+  {
+    "question": "Can WHERE reference an aggregate function like SUM(price)?",
+    "a": "Only with an alias",
+    "b": "Only inside a subquery",
+    "c": "Yes, always",
+    "d": "No — aggregates aren't computed yet when WHERE is evaluated; use HAVING instead",
+    "correctAnswer": "d",
+    "explanation": "WHERE executes before grouping/aggregation, so aggregate results don't exist yet at that stage; HAVING is the clause meant for post-aggregation filtering."
+  },
+  {
+    "question": "What does `IS NULL` test for?",
+    "a": "Whether a value equals zero",
+    "b": "Whether a column is missing entirely",
+    "c": "Whether a value equals the string 'null'",
+    "d": "Whether a value is the special NULL marker (absence of a value)",
+    "correctAnswer": "d",
+    "explanation": "NULL represents an unknown/absent value and must be tested with IS NULL / IS NOT NULL rather than `= NULL`, which never evaluates to true."
+  },
+  {
+    "question": "Why does `WHERE age = NULL` never match any rows?",
+    "a": "PostgreSQL treats it as `age = 0`",
+    "b": "It matches only rows where age was never set",
+    "c": "It's a syntax error",
+    "d": "Comparisons with NULL using = always yield NULL (unknown), never TRUE",
+    "correctAnswer": "d",
+    "explanation": "In SQL's three-valued logic, any comparison involving NULL yields UNKNOWN, and WHERE only keeps rows where the condition is TRUE — never UNKNOWN or FALSE."
+  },
+  {
+    "question": "What does COALESCE(discount, 0) return when discount is NULL?",
+    "a": "NULL",
+    "b": "An empty string",
+    "c": "0",
+    "d": "An error",
+    "correctAnswer": "c",
+    "explanation": "COALESCE returns the first non-NULL argument in its list, so it substitutes 0 whenever discount is NULL."
+  },
+  {
+    "question": "What does NULLIF(a, b) return?",
+    "a": "b if a is NULL, otherwise a",
+    "b": "NULL if a is NULL",
+    "c": "TRUE if a and b are both NULL",
+    "d": "NULL if a equals b, otherwise a",
+    "correctAnswer": "d",
+    "explanation": "NULLIF(a, b) returns NULL when a = b, and returns a otherwise — often used to avoid division by zero, e.g. `x / NULLIF(y, 0)`."
+  },
+  {
+    "question": "How many rows does `SELECT NULL = NULL;` conceptually match as TRUE?",
+    "a": "It evaluates to FALSE",
+    "b": "It throws a syntax error",
+    "c": "It evaluates to NULL (unknown)",
+    "d": "It evaluates to TRUE",
+    "correctAnswer": "c",
+    "explanation": "Comparing NULL to anything, including another NULL, yields NULL/unknown — NULL represents 'unknown', and two unknowns aren't necessarily equal."
+  },
+  {
+    "question": "Which of these correctly checks a column is NOT NULL?",
+    "a": "WHERE col IS NOT NULL",
+    "b": "WHERE NOT col = NULL",
+    "c": "WHERE col != NULL",
+    "d": "WHERE col <> NULL",
+    "correctAnswer": "a",
+    "explanation": "IS NOT NULL is the only correct way to test non-nullity; any = or <> comparison against NULL yields NULL, not TRUE/FALSE."
+  },
+  {
+    "question": "Which PostgreSQL data type stores arbitrary-length text?",
+    "a": "TEXT",
+    "b": "STRING",
+    "c": "MEMO",
+    "d": "CHAR(255)",
+    "correctAnswer": "a",
+    "explanation": "TEXT stores variable-length character data with no length limit; PostgreSQL's TEXT and VARCHAR(n) without a limit perform essentially the same internally."
+  },
+  {
+    "question": "What's the practical difference between VARCHAR(n) and VARCHAR (no length) in PostgreSQL?",
+    "a": "VARCHAR(n) enforces a maximum length of n characters, unlimited VARCHAR does not",
+    "b": "None; they behave identically",
+    "c": "Only VARCHAR(n) can be indexed",
+    "d": "VARCHAR(n) is always faster to query",
+    "correctAnswer": "a",
+    "explanation": "VARCHAR(n) adds a length constraint enforced on insert/update; VARCHAR with no length behaves like TEXT."
+  },
+  {
+    "question": "Which data type is best suited for storing monetary values requiring exact decimal precision?",
+    "a": "FLOAT",
+    "b": "REAL",
+    "c": "INTEGER",
+    "d": "NUMERIC(10,2)",
+    "correctAnswer": "d",
+    "explanation": "NUMERIC (or DECIMAL) stores exact fixed-point values, avoiding the rounding errors inherent to binary floating-point types like FLOAT/REAL."
+  },
+  {
+    "question": "What does the BOOLEAN type store in PostgreSQL?",
+    "a": "0 and 1 only",
+    "b": "'yes'/'no' strings",
+    "c": "TRUE, FALSE, and NULL",
+    "d": "TRUE and FALSE only, never NULL",
+    "correctAnswer": "c",
+    "explanation": "PostgreSQL's boolean type can hold TRUE, FALSE, or NULL (unknown) unless a NOT NULL constraint forbids the NULL state."
+  },
+  {
+    "question": "Which type would you use for a column that must auto-increment as a primary key in modern PostgreSQL?",
+    "a": "AUTOINCREMENT",
+    "b": "GENERATED ALWAYS AS IDENTITY (or the legacy SERIAL)",
+    "c": "SEQUENCE INTEGER",
+    "d": "COUNTER",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL doesn't have an AUTOINCREMENT keyword; the SQL-standard GENERATED ... AS IDENTITY is the modern recommended approach, with SERIAL as the older convention built on a sequence."
+  },
+  {
+    "question": "What does the DATE type store?",
+    "a": "A Unix timestamp integer",
+    "b": "A date and a time of day",
+    "c": "Only a calendar date (year, month, day), no time component",
+    "d": "A time zone offset only",
+    "correctAnswer": "c",
+    "explanation": "DATE stores only year, month and day, with no time-of-day or time zone component, unlike TIMESTAMP or TIMESTAMPTZ."
+  },
+  {
+    "question": "What is the difference between TIMESTAMP and TIMESTAMPTZ (timestamp with time zone) in PostgreSQL?",
+    "a": "TIMESTAMP is always more precise",
+    "b": "TIMESTAMPTZ converts input to UTC internally and adjusts on output to the session's time zone; TIMESTAMP stores wall-clock values with no time zone awareness",
+    "c": "They are aliases for the same type",
+    "d": "TIMESTAMPTZ stores a time zone name alongside the value",
+    "correctAnswer": "b",
+    "explanation": "TIMESTAMPTZ normalizes stored values to UTC and displays them converted to the current session's `TimeZone` setting; TIMESTAMP (without time zone) just stores the literal date/time with no conversion."
+  },
+  {
+    "question": "Which statement creates a new table?",
+    "a": "NEW TABLE",
+    "b": "MAKE TABLE",
+    "c": "DEFINE TABLE",
+    "d": "CREATE TABLE",
+    "correctAnswer": "d",
+    "explanation": "CREATE TABLE is the standard DDL statement for defining a new table and its columns/constraints."
+  },
+  {
+    "question": "Which statement adds a new column to an existing table?",
+    "a": "INSERT COLUMN INTO TABLE",
+    "b": "MODIFY TABLE ... ADD COLUMN",
+    "c": "UPDATE TABLE ... ADD COLUMN",
+    "d": "ALTER TABLE ... ADD COLUMN",
+    "correctAnswer": "d",
+    "explanation": "ALTER TABLE is used for schema changes like adding, dropping or altering columns and constraints."
+  },
+  {
+    "question": "Which statement permanently removes a table and all its data?",
+    "a": "DELETE TABLE orders;",
+    "b": "REMOVE TABLE orders;",
+    "c": "TRUNCATE DATABASE orders;",
+    "d": "DROP TABLE orders;",
+    "correctAnswer": "d",
+    "explanation": "DROP TABLE removes the table definition and all its data; DELETE only removes rows and TRUNCATE empties a table's rows without dropping its structure."
+  },
+  {
+    "question": "What is the difference between DELETE FROM orders; and TRUNCATE TABLE orders;?",
+    "a": "DELETE cannot be rolled back but TRUNCATE can",
+    "b": "No difference",
+    "c": "TRUNCATE quickly deallocates all pages, doesn't fire per-row triggers, and resets identity sequences by default",
+    "d": "TRUNCATE deletes rows one at a time; DELETE removes the whole table",
+    "correctAnswer": "c",
+    "explanation": "TRUNCATE is a fast bulk operation that deallocates data pages directly rather than scanning/deleting row by row, and (unlike DELETE) can reset associated identity/serial sequences."
+  },
+  {
+    "question": "Which clause safely avoids an error when dropping a table that might not exist?",
+    "a": "DROP TABLE orders SAFE;",
+    "b": "DROP TABLE orders WHEN EXISTS;",
+    "c": "DROP TABLE IF EXISTS orders;",
+    "d": "DROP TABLE orders OR IGNORE;",
+    "correctAnswer": "c",
+    "explanation": "IF EXISTS suppresses the error PostgreSQL would otherwise raise when the target object doesn't exist."
+  },
+  {
+    "question": "What does a PRIMARY KEY constraint guarantee?",
+    "a": "The column must reference another table",
+    "b": "The column(s) uniquely identify each row and cannot contain NULL",
+    "c": "The column allows duplicate but not NULL values",
+    "d": "The column is automatically indexed for full-text search",
+    "correctAnswer": "b",
+    "explanation": "A PRIMARY KEY combines uniqueness and NOT NULL, uniquely identifying every row, and PostgreSQL automatically creates a unique index to enforce it."
+  },
+  {
+    "question": "What does a FOREIGN KEY constraint enforce?",
+    "a": "That values in the column must exist in a referenced table's key column (referential integrity)",
+    "b": "That the column is unique across the table",
+    "c": "That the column is automatically populated",
+    "d": "That the column cannot be NULL",
+    "correctAnswer": "a",
+    "explanation": "A FOREIGN KEY enforces referential integrity: every non-NULL value in the referencing column must match an existing value in the referenced table's key."
+  },
+  {
+    "question": "What happens by default when you try to insert a row that violates a UNIQUE constraint?",
+    "a": "The row is silently ignored",
+    "b": "The old row is replaced",
+    "c": "The statement fails with a constraint-violation error",
+    "d": "PostgreSQL appends a suffix to make it unique",
+    "correctAnswer": "c",
+    "explanation": "Without an ON CONFLICT clause, inserting a duplicate value into a UNIQUE (or PRIMARY KEY) column raises an error and aborts the statement."
+  },
+  {
+    "question": "What does a CHECK constraint do?",
+    "a": "Validates JSON syntax only",
+    "b": "Verifies foreign key references exist",
+    "c": "Enforces a custom boolean condition on column values, e.g. CHECK (price > 0)",
+    "d": "Checks that a table exists before querying it",
+    "correctAnswer": "c",
+    "explanation": "CHECK constraints enforce an arbitrary boolean expression must hold true for every row, e.g. rejecting negative prices."
+  },
+  {
+    "question": "What does `NOT NULL` do when added to a column definition?",
+    "a": "Prevents duplicate values",
+    "b": "Makes the column a primary key",
+    "c": "Prevents that column from ever storing the NULL value",
+    "d": "Sets a default value of empty string",
+    "correctAnswer": "c",
+    "explanation": "NOT NULL is a constraint that rejects any INSERT/UPDATE attempting to store NULL in that column."
+  },
+  {
+    "question": "What does `DEFAULT 0` in a column definition do?",
+    "a": "Rounds all values to 0",
+    "b": "Validates that values are non-negative",
+    "c": "Supplies 0 automatically when no value is given for that column on INSERT",
+    "d": "Forces every value to be 0",
+    "correctAnswer": "c",
+    "explanation": "DEFAULT specifies the value used when an INSERT statement omits that column, without otherwise restricting what can be explicitly inserted."
+  },
+  {
+    "question": "Can a table have more than one UNIQUE constraint?",
+    "a": "Only if they're all on the same column",
+    "b": "Only in PostgreSQL 15+",
+    "c": "Yes, a table can have multiple UNIQUE constraints on different columns or column combinations",
+    "d": "No, only one per table",
+    "correctAnswer": "c",
+    "explanation": "Unlike PRIMARY KEY (limited to one per table), a table can have any number of UNIQUE constraints across different columns or combinations."
+  },
+  {
+    "question": "Which statement adds new rows to a table?",
+    "a": "CREATE ROW IN",
+    "b": "ADD INTO",
+    "c": "APPEND TO",
+    "d": "INSERT INTO",
+    "correctAnswer": "d",
+    "explanation": "INSERT INTO table (columns) VALUES (...) is the standard statement for adding new rows."
+  },
+  {
+    "question": "What happens if you run `INSERT INTO products (name) VALUES ('Widget');` and `price` has no DEFAULT and no NOT NULL constraint?",
+    "a": "`price` is set to NULL",
+    "b": "The statement fails",
+    "c": "`price` is set to 0",
+    "d": "`price` is set to the previous row's value",
+    "correctAnswer": "a",
+    "explanation": "Any column omitted from an INSERT's column list, with no DEFAULT defined, is set to NULL — as long as NOT NULL doesn't forbid it."
+  },
+  {
+    "question": "Which statement modifies existing rows in a table?",
+    "a": "UPDATE",
+    "b": "CHANGE",
+    "c": "MODIFY",
+    "d": "ALTER ROW",
+    "correctAnswer": "a",
+    "explanation": "UPDATE table SET column = value WHERE condition changes existing row values matching the condition."
+  },
+  {
+    "question": "What happens if you run `UPDATE employees SET salary = salary * 1.1;` with no WHERE clause?",
+    "a": "PostgreSQL asks for confirmation before running",
+    "b": "It fails, requiring a WHERE clause",
+    "c": "It updates every single row in the table",
+    "d": "It only updates the first row",
+    "correctAnswer": "c",
+    "explanation": "Without a WHERE clause, UPDATE (like DELETE) applies to every row in the table — a common and dangerous mistake."
+  },
+  {
+    "question": "Which statement removes rows from a table without dropping the table itself?",
+    "a": "DROP",
+    "b": "CLEAR TABLE",
+    "c": "DELETE FROM",
+    "d": "REMOVE",
+    "correctAnswer": "c",
+    "explanation": "DELETE FROM table WHERE condition removes matching rows (or all rows, if WHERE is omitted) while keeping the table structure intact."
+  },
+  {
+    "question": "What does the RETURNING clause do in PostgreSQL?",
+    "a": "Returns the affected rows' column values from an INSERT, UPDATE or DELETE statement",
+    "b": "Rolls back the statement",
+    "c": "Repeats the last statement",
+    "d": "Returns control to a stored procedure",
+    "correctAnswer": "a",
+    "explanation": "RETURNING is a PostgreSQL extension that outputs values from the rows an INSERT/UPDATE/DELETE just affected, avoiding a separate SELECT."
+  },
+  {
+    "question": "What does `INSERT INTO users (id, name) VALUES (1, 'Ana') RETURNING id;` output?",
+    "a": "An error because id is a primary key",
+    "b": "The total row count of the table",
+    "c": "The id value(s) of the row(s) just inserted",
+    "d": "Nothing, RETURNING is only valid on SELECT",
+    "correctAnswer": "c",
+    "explanation": "RETURNING id outputs the id column of the newly inserted row, useful for capturing generated keys without a follow-up query."
+  },
+  {
+    "question": "Which function converts a string to all uppercase in PostgreSQL?",
+    "a": "UCASE()",
+    "b": "TOUPPER()",
+    "c": "CAPS()",
+    "d": "UPPER()",
+    "correctAnswer": "d",
+    "explanation": "UPPER(text) is the standard SQL function for uppercasing a string; UCASE is a MySQL alias not native to PostgreSQL."
+  },
+  {
+    "question": "What does `LENGTH('hello')` return?",
+    "a": "6",
+    "b": "An error",
+    "c": "5",
+    "d": "4",
+    "correctAnswer": "c",
+    "explanation": "LENGTH() returns the number of characters in a string; 'hello' has 5 characters."
+  },
+  {
+    "question": "Which function extracts a portion of a string starting at position 2 for 3 characters?",
+    "a": "SUBSTRING('hello', 2, 3)",
+    "b": "MID('hello', 2, 3)",
+    "c": "PART('hello', 2, 3)",
+    "d": "LEFT('hello', 2, 3)",
+    "correctAnswer": "a",
+    "explanation": "SUBSTRING(string FROM start FOR length) or its positional form SUBSTRING(string, start, length) extracts a substring; here it returns 'ell'."
+  },
+  {
+    "question": "What does `TRIM('  hello  ')` return?",
+    "a": "'  hello  '",
+    "b": "'hello'",
+    "c": "'  hello'",
+    "d": "'hello  '",
+    "correctAnswer": "b",
+    "explanation": "TRIM() removes leading and trailing whitespace (or a specified character) by default from both ends of the string."
+  },
+  {
+    "question": "Which function returns today's date without a time component in PostgreSQL?",
+    "a": "CURRENT_DATE",
+    "b": "NOW()",
+    "c": "SYSDATE",
+    "d": "GETDATE()",
+    "correctAnswer": "a",
+    "explanation": "CURRENT_DATE returns just the current date; NOW() (or CURRENT_TIMESTAMP) returns the date and time together. GETDATE/SYSDATE are SQL Server/Oracle functions, not PostgreSQL."
+  },
+  {
+    "question": "What does `NOW()` return in PostgreSQL?",
+    "a": "The current date and time with time zone",
+    "b": "The server's uptime",
+    "c": "The date of the last COMMIT",
+    "d": "The current date only",
+    "correctAnswer": "a",
+    "explanation": "NOW() returns the current transaction's timestamp as a TIMESTAMPTZ, including date, time and time zone information."
+  },
+  {
+    "question": "Which arithmetic operator computes the remainder of integer division in PostgreSQL?",
+    "a": "DIV",
+    "b": "%",
+    "c": "//",
+    "d": "MOD only, % is invalid",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL supports both the % operator and the MOD() function to compute the remainder of a division."
+  },
+  {
+    "question": "What does `5 / 2` evaluate to when both operands are INTEGER in PostgreSQL?",
+    "a": "2.5",
+    "b": "2",
+    "c": "An error",
+    "d": "3",
+    "correctAnswer": "b",
+    "explanation": "Integer division in PostgreSQL truncates toward zero, so 5 / 2 (both integers) yields 2, not the fractional 2.5."
+  },
+  {
+    "question": "How do you avoid integer truncation when dividing two integer columns to get a decimal result?",
+    "a": "Add a HAVING clause",
+    "b": "Cast at least one operand to a numeric/float type, e.g. a::numeric / b",
+    "c": "It's not possible in PostgreSQL",
+    "d": "Use MOD() instead of /",
+    "correctAnswer": "b",
+    "explanation": "Casting one side of the division to NUMERIC (or another non-integer type) forces PostgreSQL to perform floating-point/exact decimal division instead of integer division."
+  },
+  {
+    "question": "What does the semicolon at the end of a SQL statement do?",
+    "a": "Nothing, it's optional decoration",
+    "b": "Terminates the statement, letting the client/tool know where it ends",
+    "c": "Starts a comment",
+    "d": "Commits the transaction",
+    "correctAnswer": "b",
+    "explanation": "The semicolon marks the end of a SQL statement, which matters especially when multiple statements are sent together (e.g. in psql or a script)."
+  },
+  {
+    "question": "How do you write a single-line comment in SQL?",
+    "a": "/* comment",
+    "b": "# comment",
+    "c": "-- comment",
+    "d": "// comment",
+    "correctAnswer": "c",
+    "explanation": "Two dashes (--) start a single-line comment in standard SQL and PostgreSQL. /* */ is for multi-line comments."
+  },
+  {
+    "question": "What is the effect of wrapping several statements in `BEGIN; ... COMMIT;`?",
+    "a": "It disables constraint checks",
+    "b": "It runs the statements in parallel",
+    "c": "It creates a stored procedure",
+    "d": "It groups the statements into a single transaction that is applied atomically",
+    "correctAnswer": "d",
+    "explanation": "BEGIN starts a transaction; all statements until COMMIT either all succeed together or, on ROLLBACK/error, are all undone — giving atomicity."
+  },
+  {
+    "question": "What does ROLLBACK do inside a transaction?",
+    "a": "Commits all changes permanently",
+    "b": "Restarts the database server",
+    "c": "Undoes all changes made since the transaction began (or since the last savepoint)",
+    "d": "Deletes the table being modified",
+    "correctAnswer": "c",
+    "explanation": "ROLLBACK discards all changes made in the current (uncommitted) transaction, restoring the state to before BEGIN."
+  },
+  {
+    "question": "Is every standalone statement in PostgreSQL, by default, run in an implicit transaction?",
+    "a": "Only DDL statements are transactional",
+    "b": "Yes — by default each statement not inside an explicit BEGIN...COMMIT is automatically committed on success",
+    "c": "No, autocommit never applies",
+    "d": "Only SELECT statements are transactional",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL runs in autocommit mode by default: a statement outside an explicit BEGIN block is wrapped in its own implicit transaction and committed immediately if it succeeds."
+  },
+  {
+    "question": "Which keyword combines the result sets of two SELECT queries, removing duplicate rows?",
+    "a": "UNION",
+    "b": "MERGE",
+    "c": "UNION ALL",
+    "d": "JOIN",
+    "correctAnswer": "a",
+    "explanation": "UNION combines two result sets and removes duplicate rows; UNION ALL keeps duplicates and is typically faster since it skips deduplication."
+  },
+  {
+    "question": "What must be true of two SELECT queries combined with UNION?",
+    "a": "They must both have a WHERE clause",
+    "b": "They must both use ORDER BY",
+    "c": "They must return the same number of columns with compatible types",
+    "d": "They must query the same table",
+    "correctAnswer": "c",
+    "explanation": "UNION (and UNION ALL/INTERSECT/EXCEPT) requires both queries to produce the same number of columns, with each corresponding pair of columns being of compatible types."
+  },
+  {
+    "question": "Which set operator returns only rows that appear in both result sets?",
+    "a": "EXCEPT",
+    "b": "INTERSECT",
+    "c": "MINUS",
+    "d": "UNION",
+    "correctAnswer": "b",
+    "explanation": "INTERSECT returns the rows common to both queries' result sets. MINUS is Oracle's name for what PostgreSQL calls EXCEPT."
+  },
+  {
+    "question": "Which set operator returns rows from the first query that do not appear in the second?",
+    "a": "EXCEPT",
+    "b": "UNION",
+    "c": "INTERSECT",
+    "d": "DIFF",
+    "correctAnswer": "a",
+    "explanation": "EXCEPT returns rows present in the first query's result but absent from the second's — PostgreSQL's equivalent of Oracle's MINUS."
+  },
+  {
+    "question": "What is a subquery?",
+    "a": "A query nested inside another query, e.g. in WHERE, FROM, or SELECT",
+    "b": "A query stored as a view",
+    "c": "A query that only returns one column",
+    "d": "A shortcut for JOIN",
+    "correctAnswer": "a",
+    "explanation": "A subquery (or inner query) is a SELECT statement embedded within another SQL statement, usable in WHERE, FROM, or the SELECT list."
+  },
+  {
+    "question": "What does this do? `SELECT name FROM products WHERE price > (SELECT AVG(price) FROM products);`",
+    "a": "Selects products priced above the average product price",
+    "b": "Selects all products, ignoring price",
+    "c": "Selects the single most expensive product",
+    "d": "Causes a syntax error since subqueries can't be compared with >",
+    "correctAnswer": "a",
+    "explanation": "The subquery computes the overall average price once, and the outer query keeps only products priced above that average."
+  },
+  {
+    "question": "What is the difference between a subquery used with `=` versus `IN`?",
+    "a": "`=` requires the subquery to return exactly one row/value, `IN` accepts multiple",
+    "b": "`=` is always faster",
+    "c": "They behave identically",
+    "d": "`IN` only works with strings",
+    "correctAnswer": "a",
+    "explanation": "Using = against a subquery that returns more than one row raises a runtime error ('more than one row returned'); IN is designed to compare against a list of values from a multi-row subquery."
+  },
+  {
+    "question": "What does the EXISTS operator check?",
+    "a": "Whether an index exists on a column",
+    "b": "Whether a column allows NULLs",
+    "c": "Whether a subquery returns at least one row",
+    "d": "Whether a table exists in the schema",
+    "correctAnswer": "c",
+    "explanation": "EXISTS (subquery) evaluates to TRUE if the subquery returns one or more rows, and is commonly used for existence checks without caring about the actual returned values."
+  },
+  {
+    "question": "Which query style is generally preferred to check 'does this customer have any orders?'",
+    "a": "SELECT * FROM orders WHERE customer_id = c.id LIMIT 1000",
+    "b": "SELECT EXISTS (SELECT 1 FROM orders WHERE customer_id = c.id)",
+    "c": "SELECT SUM(1) FROM orders WHERE customer_id = c.id",
+    "d": "SELECT COUNT(*) FROM orders WHERE customer_id = c.id > 0",
+    "correctAnswer": "b",
+    "explanation": "EXISTS can short-circuit as soon as one matching row is found, making it typically more efficient than counting all matches just to check for existence."
+  },
+  {
+    "question": "What is a CTE (Common Table Expression)?",
+    "a": "A constraint on foreign keys",
+    "b": "A named temporary result set defined with WITH, usable within a single statement",
+    "c": "A type of index",
+    "d": "A permanent table stored in the schema",
+    "correctAnswer": "b",
+    "explanation": "A CTE, introduced with WITH name AS (query), defines a named subquery that can be referenced later in the same statement, improving readability."
+  },
+  {
+    "question": "What is the basic syntax to define a CTE named `recent_orders`?",
+    "a": "CREATE VIEW recent_orders (SELECT ...)",
+    "b": "DEFINE recent_orders (SELECT ...)",
+    "c": "CTE recent_orders AS (SELECT ...)",
+    "d": "WITH recent_orders AS (SELECT ...) SELECT ...",
+    "correctAnswer": "d",
+    "explanation": "The WITH clause introduces one or more CTEs before the main query that references them."
+  },
+  {
+    "question": "Which is a key benefit of a CTE over a deeply nested subquery?",
+    "a": "CTEs remove the need for JOINs",
+    "b": "CTEs improve readability by giving intermediate results a name, and can be reused multiple times in the outer query",
+    "c": "CTEs can modify data while SELECTing",
+    "d": "CTEs always execute faster",
+    "correctAnswer": "b",
+    "explanation": "CTEs primarily aid readability and let you reference the same named result multiple times in the outer query without repeating the subquery."
+  },
+  {
+    "question": "What does `SELECT * FROM employees WHERE department_id IS NOT NULL;` return?",
+    "a": "All employees, regardless of department",
+    "b": "Employees that are assigned to a department (department_id has a value)",
+    "c": "Employees not assigned to any department",
+    "d": "Only distinct department IDs",
+    "correctAnswer": "b",
+    "explanation": "IS NOT NULL filters for rows where department_id holds an actual (non-NULL) value, i.e. employees with an assigned department."
+  },
+  {
+    "question": "What is the purpose of a schema in PostgreSQL?",
+    "a": "It's another name for a database",
+    "b": "It's a namespace that groups tables, views and other objects within a database",
+    "c": "It defines the physical disk location of data files",
+    "d": "It stores query execution plans",
+    "correctAnswer": "b",
+    "explanation": "A schema is a logical namespace inside a database (the default is `public`), letting you organize and separate objects, e.g. `sales.orders` vs `reporting.orders`."
+  },
+  {
+    "question": "What does `information_schema.tables` typically let you do?",
+    "a": "Store user data",
+    "b": "Back up the entire database",
+    "c": "Define new foreign keys",
+    "d": "Query metadata about tables that exist in the database",
+    "correctAnswer": "d",
+    "explanation": "information_schema is a standard SQL metadata schema; querying information_schema.tables lists tables (and views) visible to the current user, useful for introspection."
+  },
+  {
+    "question": "Which command shows the structure (columns, types) of a table when using psql?",
+    "a": "DESCRIBE orders;",
+    "b": "\\d orders",
+    "c": "SHOW TABLE orders;",
+    "d": "EXPLAIN orders;",
+    "correctAnswer": "b",
+    "explanation": "\\d table_name is a psql meta-command that describes a table's columns, types, indexes and constraints. DESCRIBE is MySQL/Oracle syntax, not PostgreSQL."
+  },
+  {
+    "question": "What does CASE WHEN ... THEN ... ELSE ... END let you do in a SELECT list?",
+    "a": "Loop over rows",
+    "b": "Create a trigger",
+    "c": "Define a new table",
+    "d": "Return different values conditionally, like an inline if/else expression",
+    "correctAnswer": "d",
+    "explanation": "CASE is SQL's conditional expression, evaluating WHEN conditions in order and returning the matching THEN value (or ELSE's, or NULL if no ELSE and none match)."
+  },
+  {
+    "question": "What does this return for a row where `score` is 45? `CASE WHEN score >= 50 THEN 'pass' ELSE 'fail' END`",
+    "a": "An error",
+    "b": "'fail'",
+    "c": "NULL",
+    "d": "'pass'",
+    "correctAnswer": "b",
+    "explanation": "Since 45 is not >= 50, the WHEN condition is false, so the ELSE branch 'fail' is returned."
+  },
+  {
+    "question": "What happens if a CASE expression has no matching WHEN and no ELSE clause?",
+    "a": "It returns NULL",
+    "b": "It returns an empty string",
+    "c": "It raises an error",
+    "d": "It returns 0",
+    "correctAnswer": "a",
+    "explanation": "Without an ELSE branch, a CASE expression implicitly returns NULL when none of the WHEN conditions are true."
+  },
+  {
+    "question": "Which keyword renames a table or column alias inline without needing AS, e.g. `SELECT price total`?",
+    "a": "Only valid inside CTEs",
+    "b": "This is invalid; AS is mandatory",
+    "c": "Only valid for table aliases, not columns",
+    "d": "It's valid — AS is optional for column aliases in PostgreSQL",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL allows omitting AS for column aliases (though it's still required, or at least conventional, in some contexts like table aliases with reserved words)."
+  },
+  {
+    "question": "What is the effect of `SELECT * FROM orders o;`?",
+    "a": "Orders the results by a column called 'o'",
+    "b": "Filters orders where a column equals 'o'",
+    "c": "Causes a syntax error",
+    "d": "Assigns `o` as a table alias for `orders`, usable to qualify columns",
+    "correctAnswer": "d",
+    "explanation": "Writing a table name followed by another identifier creates a table alias, letting later parts of the query reference columns as o.column_name."
+  },
+  {
+    "question": "Why might you need to qualify a column with its table alias, e.g. `o.id` instead of just `id`?",
+    "a": "To make the query run faster",
+    "b": "It's purely stylistic and never required",
+    "c": "Because PostgreSQL requires all columns to be qualified",
+    "d": "To disambiguate when the same column name exists in more than one joined table",
+    "correctAnswer": "d",
+    "explanation": "When multiple joined tables share a column name (e.g. both `orders` and `customers` have `id`), PostgreSQL needs the alias/table prefix to know which one you mean."
+  }
+]

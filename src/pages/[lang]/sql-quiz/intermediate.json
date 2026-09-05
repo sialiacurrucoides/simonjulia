@@ -1,0 +1,902 @@
+[
+  {
+    "question": "What distinguishes a LEFT JOIN from a RIGHT JOIN?",
+    "a": "RIGHT JOIN is faster because it scans right to left",
+    "b": "LEFT JOIN preserves all rows of the first (left) table; RIGHT JOIN preserves all rows of the second (right) table",
+    "c": "LEFT JOIN cannot be combined with WHERE",
+    "d": "They are functionally identical, only the syntax differs",
+    "correctAnswer": "b",
+    "explanation": "LEFT and RIGHT JOIN differ only in which side's unmatched rows are preserved with NULLs on the other side; any RIGHT JOIN can be rewritten as a LEFT JOIN by swapping table order."
+  },
+  {
+    "question": "What does a FULL OUTER JOIN return?",
+    "a": "The Cartesian product of both tables",
+    "b": "All rows from both tables, with NULLs where no match exists on either side",
+    "c": "Only rows unique to the left table",
+    "d": "Only matching rows from both tables",
+    "correctAnswer": "b",
+    "explanation": "FULL OUTER JOIN combines LEFT and RIGHT JOIN behavior: every row from both tables appears, with NULLs filled in wherever there's no matching counterpart."
+  },
+  {
+    "question": "Why might filtering a LEFT JOIN's right-side table in the WHERE clause silently turn it into an INNER JOIN?",
+    "a": "A WHERE condition on the right table's non-NULL columns excludes the unmatched rows the LEFT JOIN was preserving (since NULL fails most comparisons)",
+    "b": "It only happens with RIGHT JOIN, not LEFT JOIN",
+    "c": "It never does; WHERE and ON are always equivalent",
+    "d": "PostgreSQL automatically rewrites LEFT JOIN to INNER JOIN for performance",
+    "correctAnswer": "a",
+    "explanation": "A classic gotcha: `LEFT JOIN orders o ON ... WHERE o.status = 'shipped'` drops the unmatched customer rows too, because their o.status is NULL and NULL = 'shipped' is never true. The filter belongs in the ON clause to preserve LEFT JOIN semantics."
+  },
+  {
+    "question": "Given `SELECT c.name, o.id FROM customers c LEFT JOIN orders o ON c.id = o.customer_id AND o.status = 'shipped';`, what happens to a customer with only cancelled orders?",
+    "a": "PostgreSQL raises an error",
+    "b": "The customer row appears once per cancelled order",
+    "c": "The customer row is excluded entirely",
+    "d": "The customer row appears once with o.id as NULL",
+    "correctAnswer": "d",
+    "explanation": "Because the status filter is in the ON clause (part of the join condition), the LEFT JOIN still preserves the customer row even when no order matches, showing NULL for the order columns."
+  },
+  {
+    "question": "What is a self-join typically used for?",
+    "a": "Merging two databases",
+    "b": "Joining a table to a view of itself only",
+    "c": "Comparing rows of a table to other rows in the same table, e.g. employees to their managers",
+    "d": "Only valid on partitioned tables",
+    "correctAnswer": "c",
+    "explanation": "A self-join (a table joined to itself via two aliases) is the standard way to express hierarchical or peer relationships stored in one table, such as an employee referencing a manager_id in the same table."
+  },
+  {
+    "question": "What does HAVING COUNT(*) > 1 typically identify when grouped by an email column?",
+    "a": "Customers with no orders",
+    "b": "The single most common email",
+    "c": "Duplicate email addresses (groups occurring more than once)",
+    "d": "All customers",
+    "correctAnswer": "c",
+    "explanation": "GROUP BY email followed by HAVING COUNT(*) > 1 isolates groups (emails) that appear more than once — the classic pattern for finding duplicates."
+  },
+  {
+    "question": "Can a HAVING clause reference a column alias defined in the SELECT list, e.g. `SELECT dept, COUNT(*) AS cnt ... HAVING cnt > 5`?",
+    "a": "Never, aliases are unusable outside SELECT",
+    "b": "Only inside a CTE",
+    "c": "Only if the alias matches the column name exactly",
+    "d": "Yes — PostgreSQL (unlike strict standard SQL) allows referencing SELECT-list aliases in HAVING, GROUP BY and ORDER BY",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL is more permissive than the SQL standard here and allows output-column aliases to be reused in GROUP BY, HAVING, and ORDER BY, which is a handy but non-portable feature."
+  },
+  {
+    "question": "What's the difference in execution order between WHERE and HAVING?",
+    "a": "They execute at the same time",
+    "b": "HAVING always executes before WHERE regardless of SQL",
+    "c": "WHERE runs after GROUP BY, HAVING runs before",
+    "d": "WHERE filters rows before grouping; HAVING filters groups after aggregation",
+    "correctAnswer": "d",
+    "explanation": "Logical query processing order is roughly FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY, so WHERE operates on raw rows and HAVING operates on already-aggregated groups."
+  },
+  {
+    "question": "What does GROUPING SETS allow you to do?",
+    "a": "Create indexes on grouped columns",
+    "b": "Replace HAVING entirely",
+    "c": "Compute multiple grouping combinations (e.g. by region, by product, and overall) in a single query",
+    "d": "Restrict GROUP BY to a maximum of one column",
+    "correctAnswer": "c",
+    "explanation": "GROUPING SETS ((a,b), (a), ()) lets one query produce several levels of aggregation (subtotals and a grand total) that would otherwise require multiple UNIONed queries."
+  },
+  {
+    "question": "What is the relationship between ROLLUP and GROUPING SETS?",
+    "a": "ROLLUP only works with two columns maximum",
+    "b": "ROLLUP is unrelated to grouping",
+    "c": "ROLLUP(a, b) is shorthand for the grouping sets (a,b), (a), () — a hierarchical set of subtotals",
+    "d": "ROLLUP replaces ORDER BY",
+    "correctAnswer": "c",
+    "explanation": "ROLLUP generates a hierarchy of subtotals from most to least detailed, ending in a grand total — a common shorthand equivalent to a specific GROUPING SETS pattern."
+  },
+  {
+    "question": "What does a correlated subquery mean?",
+    "a": "A subquery that never references the outer query",
+    "b": "A subquery that must use EXISTS",
+    "c": "A subquery inside a CTE",
+    "d": "A subquery that references a column from the outer query, and is conceptually re-evaluated per outer row",
+    "correctAnswer": "d",
+    "explanation": "A correlated subquery depends on values from the enclosing query (e.g. `WHERE o.customer_id = c.id`), so conceptually it runs once per outer row, though the planner may optimize the actual execution."
+  },
+  {
+    "question": "Rewrite this correlated pattern as a JOIN-friendly equivalent: 'find customers who have placed at least one order.'",
+    "a": "SELECT * FROM customers, orders;",
+    "b": "SELECT * FROM customers ORDER BY (SELECT customer_id FROM orders);",
+    "c": "SELECT * FROM customers WHERE id = ANY(SELECT * FROM orders);",
+    "d": "SELECT * FROM customers WHERE EXISTS (SELECT 1 FROM orders WHERE orders.customer_id = customers.id);",
+    "correctAnswer": "d",
+    "explanation": "EXISTS with a correlated subquery is the idiomatic way to test for related rows without producing duplicate customer rows the way a plain JOIN might."
+  },
+  {
+    "question": "Why can a plain INNER JOIN between customers and orders produce duplicate customer rows compared to using EXISTS?",
+    "a": "The JOIN multiplies each customer row by the number of matching order rows, while EXISTS only checks presence and returns one row per customer",
+    "b": "EXISTS always returns more rows than JOIN",
+    "c": "INNER JOIN is deprecated",
+    "d": "There's no difference in output cardinality",
+    "correctAnswer": "a",
+    "explanation": "A JOIN produces one output row per matching pair, so a customer with 3 orders appears 3 times; EXISTS is a boolean test and doesn't multiply rows, useful when you just need presence, not the order details."
+  },
+  {
+    "question": "What does `SELECT ... FROM a JOIN b ON a.id = b.a_id` combined with `SELECT DISTINCT a.*` risk hiding?",
+    "a": "Nothing, DISTINCT has no downsides here",
+    "b": "That the join is a one-to-many relationship, and DISTINCT is masking row duplication instead of the query being restructured to avoid it (e.g. via EXISTS)",
+    "c": "It converts the INNER JOIN into a LEFT JOIN",
+    "d": "It always improves performance",
+    "correctAnswer": "b",
+    "explanation": "Slapping DISTINCT on a fan-out join is a common anti-pattern/code smell — it hides row multiplication rather than addressing the underlying one-to-many relationship, and can silently drop legitimately distinct combinations you actually needed."
+  },
+  {
+    "question": "What is the primary use of a window function like `SUM(amount) OVER (PARTITION BY customer_id)`?",
+    "a": "It computes an aggregate per partition while still returning one row per original row",
+    "b": "It's identical to a subquery in the SELECT list",
+    "c": "It replaces ORDER BY",
+    "d": "It collapses rows into one row per customer, like GROUP BY",
+    "correctAnswer": "a",
+    "explanation": "Unlike GROUP BY, a window function's OVER() clause computes aggregates 'alongside' each row without collapsing the result set — every original row is preserved, now annotated with its partition's aggregate."
+  },
+  {
+    "question": "What does ROW_NUMBER() OVER (ORDER BY created_at) assign?",
+    "a": "The count of rows sharing the same created_at",
+    "b": "The same number to rows with equal created_at",
+    "c": "A unique, sequential integer to each row based on the specified order, with no ties",
+    "d": "A random number per row",
+    "correctAnswer": "c",
+    "explanation": "ROW_NUMBER() always produces a strictly increasing sequence of unique integers per partition, even when ORDER BY values tie — unlike RANK()/DENSE_RANK(), which handle ties differently."
+  },
+  {
+    "question": "What's the difference between RANK() and DENSE_RANK() when there's a tie?",
+    "a": "RANK() ignores ORDER BY",
+    "b": "RANK() leaves a gap in numbering after a tie (e.g. 1,2,2,4); DENSE_RANK() does not (1,2,2,3)",
+    "c": "No difference",
+    "d": "DENSE_RANK() leaves gaps, RANK() does not",
+    "correctAnswer": "b",
+    "explanation": "RANK() skips ranks equal to the number of tied rows before continuing, while DENSE_RANK() always increments by exactly 1 for the next distinct value, leaving no gaps."
+  },
+  {
+    "question": "Which window function lets you access the previous row's value without a self-join?",
+    "a": "LEAD()",
+    "b": "LAG()",
+    "c": "FIRST_VALUE()",
+    "d": "RANK()",
+    "correctAnswer": "b",
+    "explanation": "LAG(column, offset) retrieves a value from a prior row in the same result set ordering; LEAD() does the analogous thing for a following row."
+  },
+  {
+    "question": "What is the purpose of the PARTITION BY clause inside OVER()?",
+    "a": "It's required only for ROW_NUMBER()",
+    "b": "It divides rows into independent groups, each of which the window function is computed over separately",
+    "c": "It sorts rows globally",
+    "d": "It filters out rows before the window function runs",
+    "correctAnswer": "b",
+    "explanation": "PARTITION BY resets the window function's calculation at each partition boundary, similar in spirit to GROUP BY but without collapsing rows."
+  },
+  {
+    "question": "Without an explicit frame clause, what is the default window frame for an aggregate window function with ORDER BY (e.g. SUM(x) OVER (ORDER BY y))?",
+    "a": "The entire partition, unconditionally",
+    "b": "The last 10 rows",
+    "c": "RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW — a running total up to the current row (with peer-row caveats)",
+    "d": "Only the current row",
+    "correctAnswer": "c",
+    "explanation": "When ORDER BY is present but no explicit frame is given, PostgreSQL defaults to RANGE UNBOUNDED PRECEDING TO CURRENT ROW, producing a running/cumulative aggregate — a frequent source of confusion for people expecting a whole-partition total."
+  },
+  {
+    "question": "What does DISTINCT ON (customer_id) ... ORDER BY customer_id, created_at DESC accomplish?",
+    "a": "Groups by customer_id and sums created_at",
+    "b": "Returns exactly one row per customer_id — the first row per group according to the ORDER BY",
+    "c": "It's invalid syntax",
+    "d": "Removes all duplicate rows in the result",
+    "correctAnswer": "b",
+    "explanation": "DISTINCT ON is a PostgreSQL-specific extension that keeps only the first row of each group of rows sharing the DISTINCT ON expression, per the given ORDER BY — often used to fetch 'latest row per group' without a window function."
+  },
+  {
+    "question": "Why must the DISTINCT ON expression appear as the leading term(s) in ORDER BY?",
+    "a": "Because DISTINCT ON ignores ORDER BY entirely",
+    "b": "It's just a style convention, not enforced",
+    "c": "Only applies when using LIMIT",
+    "d": "PostgreSQL requires it so it knows which row is 'first' within each DISTINCT ON group deterministically",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL requires the DISTINCT ON columns to be a prefix of ORDER BY so that, within each group, rows are consistently ordered and 'the first row' has a well-defined meaning."
+  },
+  {
+    "question": "What does the FILTER clause do with an aggregate function, e.g. `COUNT(*) FILTER (WHERE status = 'paid')`?",
+    "a": "Only works with SUM()",
+    "b": "Filters rows before the whole query runs, like WHERE",
+    "c": "Is a synonym for HAVING",
+    "d": "Restricts which rows are included in that specific aggregate, letting multiple conditional aggregates coexist in one query",
+    "correctAnswer": "d",
+    "explanation": "FILTER (WHERE ...) attaches a per-aggregate condition, so you can compute several different conditional counts/sums in a single GROUP BY pass instead of writing separate CASE expressions or multiple queries."
+  },
+  {
+    "question": "What is the difference between `COUNT(*) FILTER (WHERE cond)` and `COUNT(CASE WHEN cond THEN 1 END)`?",
+    "a": "FILTER only works with COUNT, never SUM or AVG",
+    "b": "CASE WHEN is faster in every version of PostgreSQL",
+    "c": "They are functionally equivalent, but FILTER is generally clearer and PostgreSQL-idiomatic",
+    "d": "They cannot produce the same result",
+    "correctAnswer": "c",
+    "explanation": "Both approaches achieve conditional aggregation with the same result; FILTER is a more explicit, standard SQL (SQL:2003) way to express it and works with any aggregate function, not just COUNT."
+  },
+  {
+    "question": "What is the purpose of a recursive CTE?",
+    "a": "To run a CTE multiple times in parallel",
+    "b": "To repeatedly reference itself to process hierarchical or graph-like data, such as an org chart or tree structure",
+    "c": "To cache subquery results permanently",
+    "d": "To bypass the need for JOINs",
+    "correctAnswer": "b",
+    "explanation": "A recursive CTE (WITH RECURSIVE) starts with a base case and repeatedly UNIONs in rows derived from the previous iteration's results, which is the standard SQL way to traverse hierarchies like employee-manager trees."
+  },
+  {
+    "question": "What are the two parts combined by UNION or UNION ALL inside a WITH RECURSIVE CTE?",
+    "a": "A SELECT and an INSERT statement",
+    "b": "A base (non-recursive) query and a recursive query that references the CTE itself",
+    "c": "The main query and an index definition",
+    "d": "Two unrelated subqueries",
+    "correctAnswer": "b",
+    "explanation": "The anchor/base term establishes the starting rows, and the recursive term (which references the CTE by name) is repeatedly evaluated against the previous iteration's output until it returns no more rows."
+  },
+  {
+    "question": "Why is UNION ALL (not UNION) almost always used inside a recursive CTE?",
+    "a": "UNION is not supported inside WITH RECURSIVE at all",
+    "b": "UNION would require de-duplicating against the ever-growing result each iteration, which is expensive and can mask legitimate repeated rows in a graph traversal",
+    "c": "UNION ALL is required syntactically, UNION causes a parse error",
+    "d": "There's no practical difference",
+    "correctAnswer": "b",
+    "explanation": "While UNION is technically allowed in a recursive CTE, it's expensive (comparing against the whole accumulated result each step) and can be semantically wrong for graphs with legitimately repeated intermediate rows; UNION ALL is the typical, efficient choice."
+  },
+  {
+    "question": "What risk does a poorly-bounded recursive CTE carry, e.g. one that traverses a cyclic graph without a cycle guard?",
+    "a": "It silently converts to a non-recursive CTE",
+    "b": "It can loop indefinitely (or until resource limits are hit), since nothing forces termination",
+    "c": "None, PostgreSQL automatically detects and stops cycles",
+    "d": "It always returns zero rows",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL does not automatically prevent infinite recursion on cyclic data; a recursive CTE traversing a cycle without an explicit 'visited nodes' guard column can run until it exhausts memory/time or hits recursion limits."
+  },
+  {
+    "question": "What does ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name accomplish in an INSERT?",
+    "a": "It deletes the conflicting row",
+    "b": "It rolls back the entire transaction on conflict",
+    "c": "On a unique/PK violation on email, it updates the existing row's name to the value that would have been inserted (an upsert)",
+    "d": "It always inserts a new row, ignoring conflicts",
+    "correctAnswer": "c",
+    "explanation": "ON CONFLICT ... DO UPDATE implements an 'upsert': when the INSERT would violate the specified unique constraint, it updates the existing row instead, with EXCLUDED referring to the row that was proposed for insertion."
+  },
+  {
+    "question": "What does ON CONFLICT DO NOTHING do?",
+    "a": "Silently skips inserting the conflicting row, leaving the existing row untouched, without raising an error",
+    "b": "Rolls back the whole transaction on any conflict",
+    "c": "Raises a warning but still inserts",
+    "d": "Is equivalent to DO UPDATE with no SET clause",
+    "correctAnswer": "a",
+    "explanation": "DO NOTHING simply suppresses the constraint-violation error and moves on, leaving the pre-existing conflicting row exactly as it was."
+  },
+  {
+    "question": "In `INSERT ... ON CONFLICT (id) DO UPDATE SET qty = t.qty + EXCLUDED.qty`, what does EXCLUDED represent?",
+    "a": "The rows deleted by a trigger",
+    "b": "A pseudo-table holding the row values that were proposed for insertion but conflicted",
+    "c": "The primary key sequence",
+    "d": "The rows that were successfully inserted",
+    "correctAnswer": "b",
+    "explanation": "EXCLUDED is a special pseudo-table available only within ON CONFLICT DO UPDATE, exposing the values from the row that triggered the conflict, so you can reference them in the UPDATE SET clause."
+  },
+  {
+    "question": "What must ON CONFLICT target — a column list, unique index, or constraint — actually correspond to?",
+    "a": "A foreign key only",
+    "b": "The table's OID",
+    "c": "Any column, indexed or not",
+    "d": "A column set covered by an existing unique constraint or unique index (or ON CONSTRAINT naming one)",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL needs an actual unique constraint/index to know what counts as a 'conflict'; specifying arbitrary non-unique columns raises an error since there'd be no way to detect a violation."
+  },
+  {
+    "question": "What does `EXPLAIN SELECT ...` show?",
+    "a": "The table's DDL",
+    "b": "The query results",
+    "c": "A list of all indexes on the table",
+    "d": "The planner's chosen execution plan (without running the query, by default)",
+    "correctAnswer": "d",
+    "explanation": "EXPLAIN prints the query plan the planner intends to use — scan types, join methods, estimated costs and row counts — without actually executing the query."
+  },
+  {
+    "question": "What additional information does `EXPLAIN ANALYZE` provide compared to plain `EXPLAIN`?",
+    "a": "It only works on INSERT/UPDATE/DELETE",
+    "b": "Nothing extra, it's an alias",
+    "c": "It shows the query's source code",
+    "d": "It actually executes the query and reports real timing and row counts alongside the estimates",
+    "correctAnswer": "d",
+    "explanation": "EXPLAIN ANALYZE runs the query for real and reports actual elapsed time and row counts next to the planner's estimates, which is essential for spotting where estimates are badly wrong."
+  },
+  {
+    "question": "In an EXPLAIN plan, what does a 'Seq Scan' on a large table often indicate as a potential concern?",
+    "a": "The query is guaranteed to be optimal",
+    "b": "It means the query used a materialized view",
+    "c": "PostgreSQL is reading the entire table row by row, which can be slow if a selective index could have been used instead",
+    "d": "The table has too many indexes",
+    "correctAnswer": "c",
+    "explanation": "A sequential scan reads every row in the table; on a large table with a highly selective WHERE condition, that's often a sign a missing or unused index is forcing a full scan instead of an index scan."
+  },
+  {
+    "question": "Why might PostgreSQL choose a Seq Scan even when an index exists on the filtered column?",
+    "a": "If the predicate matches a large fraction of the table, a sequential scan can be cheaper than the random I/O of an index scan plus table lookups",
+    "b": "Indexes only apply to primary keys",
+    "c": "It's always a planner bug",
+    "d": "PostgreSQL never uses Seq Scan if an index exists",
+    "correctAnswer": "a",
+    "explanation": "The query planner is cost-based: when a condition isn't selective (matches a large share of rows), scanning the whole table sequentially can genuinely be cheaper than probing an index for a huge number of matches."
+  },
+  {
+    "question": "What is the general purpose of a database index?",
+    "a": "To speed up lookups/filtering/sorting by avoiding a full table scan, at the cost of extra storage and slower writes",
+    "b": "To compress table storage",
+    "c": "To enforce data types",
+    "d": "To automatically validate foreign keys",
+    "correctAnswer": "a",
+    "explanation": "An index is an auxiliary data structure that trades additional storage and slightly slower writes (it must be maintained) for much faster reads on the indexed columns."
+  },
+  {
+    "question": "What is PostgreSQL's default index type, suited for equality and range queries?",
+    "a": "BRIN",
+    "b": "B-tree",
+    "c": "HASH",
+    "d": "GIN",
+    "correctAnswer": "b",
+    "explanation": "B-tree is the default and most versatile index type in PostgreSQL, efficient for =, <, >, BETWEEN, and ORDER BY on the indexed columns."
+  },
+  {
+    "question": "Why doesn't a B-tree index on (last_name, first_name) help a query filtering only on first_name?",
+    "a": "B-tree indexes never help with equality filters",
+    "b": "PostgreSQL automatically creates a second index behind the scenes",
+    "c": "A multicolumn B-tree index is generally only useful when the query filters on a leading prefix of the indexed columns",
+    "d": "It does help equally well, order doesn't matter",
+    "correctAnswer": "c",
+    "explanation": "A composite B-tree index is physically sorted by the first column, then the second, etc.; searching only on a non-leading column (first_name here) generally can't use the index efficiently, similar to a phone book sorted by last name being useless for finding by first name."
+  },
+  {
+    "question": "What does a UNIQUE index do beyond a regular index?",
+    "a": "It disables NULL values entirely",
+    "b": "Nothing different",
+    "c": "It also enforces that no two rows can have equal (non-NULL) values in the indexed column(s)",
+    "d": "It only works on primary keys",
+    "correctAnswer": "c",
+    "explanation": "A UNIQUE index both speeds up lookups and enforces a uniqueness constraint — PostgreSQL automatically creates one when you declare PRIMARY KEY or UNIQUE."
+  },
+  {
+    "question": "What's a common oversight when defining a FOREIGN KEY column without a matching index?",
+    "a": "PostgreSQL automatically creates the index anyway",
+    "b": "Deleting/updating rows on the referenced table can require a full scan of the referencing table to check dependent rows, hurting performance",
+    "c": "It causes silent data corruption",
+    "d": "The foreign key constraint fails to be created",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL does NOT automatically index foreign key columns; without one, operations on the parent table that must check for dependent rows (e.g. DELETE with ON DELETE actions, or explicit checks) can be slow due to sequential scans on the child table."
+  },
+  {
+    "question": "What does a partial index like `CREATE INDEX ON orders (id) WHERE status = 'pending';` do?",
+    "a": "Creates a temporary index that's dropped after the session",
+    "b": "Indexes the entire table but only the id column",
+    "c": "Is invalid syntax",
+    "d": "Only indexes the subset of rows matching the WHERE predicate, which can be smaller and faster than a full index for queries matching that predicate",
+    "correctAnswer": "d",
+    "explanation": "A partial index includes only rows satisfying the given condition, which reduces its size and maintenance cost while still speeding up queries that filter on that same condition."
+  },
+  {
+    "question": "Why can adding too many indexes to a heavily-written table be counterproductive?",
+    "a": "Indexes make SELECT queries slower",
+    "b": "Indexes are rebuilt automatically every hour",
+    "c": "Every index must be updated on every INSERT/UPDATE/DELETE, so excess indexes slow down writes and use more disk",
+    "d": "PostgreSQL has a hard limit of 3 indexes per table",
+    "correctAnswer": "c",
+    "explanation": "Indexes aren't free: each one adds overhead to every write operation that touches the indexed columns, so a table with many rarely-used indexes can suffer noticeably slower writes."
+  },
+  {
+    "question": "What does the READ COMMITTED isolation level (PostgreSQL's default) guarantee?",
+    "a": "It is equivalent to SERIALIZABLE",
+    "b": "A transaction never sees any data committed by other transactions",
+    "c": "Each statement within the transaction sees a snapshot of data committed as of that statement's start — but a later statement in the same transaction can see newly committed changes from others",
+    "d": "It prevents all concurrent writes",
+    "correctAnswer": "c",
+    "explanation": "READ COMMITTED takes a fresh snapshot per statement (not per transaction), so two SELECTs in the same transaction can see different data if another transaction committed changes in between — the classic 'non-repeatable read' phenomenon."
+  },
+  {
+    "question": "What is a 'non-repeatable read'?",
+    "a": "A read that can only happen once per session",
+    "b": "Re-running the same SELECT within one transaction returns different results because another transaction committed changes in between",
+    "c": "A SELECT that returns zero rows",
+    "d": "A read that fails due to a syntax error",
+    "correctAnswer": "b",
+    "explanation": "This is a well-known concurrency anomaly permitted under READ COMMITTED (but prevented under REPEATABLE READ and SERIALIZABLE), where the same query re-run mid-transaction sees different committed data."
+  },
+  {
+    "question": "What extra guarantee does REPEATABLE READ provide over READ COMMITTED in PostgreSQL?",
+    "a": "It locks every row it reads for the whole transaction",
+    "b": "It disables all concurrent transactions",
+    "c": "None, they're identical in PostgreSQL",
+    "d": "The whole transaction sees one consistent snapshot as of its start, so repeated reads of the same data return the same results",
+    "correctAnswer": "d",
+    "explanation": "REPEATABLE READ takes its snapshot once, at the start of the transaction, so all statements in it see a consistent view — preventing non-repeatable reads (though PostgreSQL's implementation can still surface serialization errors on conflicting writes)."
+  },
+  {
+    "question": "What does SERIALIZABLE isolation guarantee that REPEATABLE READ does not?",
+    "a": "It removes the need for indexes",
+    "b": "Faster performance than READ COMMITTED",
+    "c": "The outcome is as if transactions ran one at a time in some serial order, preventing subtle write-skew anomalies possible under REPEATABLE READ",
+    "d": "It allows dirty reads",
+    "correctAnswer": "c",
+    "explanation": "SERIALIZABLE is PostgreSQL's strictest isolation level, using predicate locking to detect and abort transactions (with a serialization failure) whose concurrent execution couldn't be reproduced by any serial ordering — closing gaps like write skew that REPEATABLE READ still permits."
+  },
+  {
+    "question": "What does a 'dirty read' mean, and does PostgreSQL ever allow it?",
+    "a": "Reading from a corrupted table; only possible after a crash",
+    "b": "A SELECT with too many JOINs",
+    "c": "Reading data that hasn't been formatted; PostgreSQL allows it at READ COMMITTED",
+    "d": "Reading uncommitted changes from another transaction; PostgreSQL never allows this at any isolation level",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL never implements a true READ UNCOMMITTED level — even its READ UNCOMMITTED setting behaves like READ COMMITTED — so dirty reads (seeing another transaction's uncommitted changes) simply cannot happen."
+  },
+  {
+    "question": "What does SELECT ... FOR UPDATE do?",
+    "a": "Updates the selected rows immediately",
+    "b": "Forces a full table scan",
+    "c": "Marks the rows for deletion",
+    "d": "Locks the selected rows so concurrent transactions cannot modify (or also FOR UPDATE lock) them until this transaction commits or rolls back",
+    "correctAnswer": "d",
+    "explanation": "FOR UPDATE takes row-level locks on the selected rows, commonly used to safely read-then-update a row (e.g. decrementing inventory) without another transaction racing in between."
+  },
+  {
+    "question": "What problem can arise from a transaction holding a `SELECT ... FOR UPDATE` lock for a long time?",
+    "a": "Other transactions trying to lock or update the same rows will block, potentially causing contention or deadlocks",
+    "b": "None, locks are always instantaneous",
+    "c": "The lock is automatically released after 1 second",
+    "d": "It prevents SELECT statements without FOR UPDATE from running at all",
+    "correctAnswer": "a",
+    "explanation": "Row locks held by a long-running transaction block other transactions wanting conflicting locks on the same rows, which can cascade into significant contention or, in more complex scenarios, deadlocks."
+  },
+  {
+    "question": "What is a deadlock in the context of PostgreSQL transactions?",
+    "a": "Two or more transactions each waiting on a lock the other holds, so neither can proceed — PostgreSQL detects this and aborts one",
+    "b": "A transaction that never commits",
+    "c": "A syntax error inside BEGIN/COMMIT",
+    "d": "A table that has become permanently locked",
+    "correctAnswer": "a",
+    "explanation": "PostgreSQL's deadlock detector periodically checks for these circular wait conditions and forcibly rolls back one of the involved transactions (raising a deadlock_detected error) to break the cycle."
+  },
+  {
+    "question": "What is the effect of a SAVEPOINT inside a transaction?",
+    "a": "It starts a nested, fully independent transaction",
+    "b": "It has no effect in PostgreSQL",
+    "c": "It marks a point you can roll back to (via ROLLBACK TO SAVEPOINT) without discarding the entire transaction",
+    "d": "It commits everything up to that point permanently",
+    "correctAnswer": "c",
+    "explanation": "SAVEPOINT creates a named point within a transaction; ROLLBACK TO SAVEPOINT undoes only the work done since that point, letting you recover from an error without abandoning the whole transaction."
+  },
+  {
+    "question": "What happens to a transaction after an error occurs mid-transaction, if no SAVEPOINT was used?",
+    "a": "PostgreSQL ignores the error and continues",
+    "b": "Only the failing statement is rolled back automatically",
+    "c": "The transaction auto-commits what succeeded so far",
+    "d": "The whole transaction enters an aborted state, and every subsequent command (except ROLLBACK) is rejected until it's rolled back",
+    "correctAnswer": "d",
+    "explanation": "Once any statement inside a transaction errors, PostgreSQL marks the whole transaction as aborted; you must ROLLBACK (or ROLLBACK TO a prior SAVEPOINT) before issuing any further commands in that transaction."
+  },
+  {
+    "question": "What is the purpose of the JSONB data type versus JSON in PostgreSQL?",
+    "a": "There's no functional difference, only naming",
+    "b": "JSONB stores JSON as plain text; JSON is binary",
+    "c": "JSONB can't store nested objects",
+    "d": "JSONB stores data in a decomposed binary format enabling indexing and faster operator-based querying, at the cost of losing exact input formatting/key order and slightly slower input",
+    "correctAnswer": "d",
+    "explanation": "JSON stores an exact copy of the input text (preserving whitespace and key order, and duplicate keys) and must be re-parsed on each operation; JSONB parses on input into a binary structure, supports GIN indexing, and is almost always preferred for querying."
+  },
+  {
+    "question": "What does the -> operator return when applied to a JSONB column, e.g. `data->'address'`?",
+    "a": "A boolean indicating whether the key exists",
+    "b": "An error unless the key exists",
+    "c": "The value as plain text always",
+    "d": "The value as JSONB (or NULL if the key is absent)",
+    "correctAnswer": "d",
+    "explanation": "-> extracts a JSON object field or array element as JSON(B); ->> is the variant that returns the result as text instead."
+  },
+  {
+    "question": "What is the difference between -> and ->> on a JSONB value?",
+    "a": "->> is deprecated",
+    "b": "-> returns the value as JSON(B); ->> returns it as text",
+    "c": "No difference, they're aliases",
+    "d": "-> only works on arrays; ->> only on objects",
+    "correctAnswer": "b",
+    "explanation": "-> preserves the JSON(B) type of the extracted value (useful for further JSON operations or nested chaining), while ->> casts the result to text, handy for comparisons with plain strings or numbers."
+  },
+  {
+    "question": "What does the containment operator @> check, e.g. `data @> '{\"active\": true}'`?",
+    "a": "Whether the JSONB on the left contains the structure/key-values on the right",
+    "b": "String concatenation of two JSON values",
+    "c": "Whether data equals exactly the right-hand JSON",
+    "d": "Whether data is greater than the right-hand JSON",
+    "correctAnswer": "a",
+    "explanation": "@> tests JSONB containment — whether the left value includes the key/value pairs (or array elements) present on the right — and is the operator typically accelerated by a GIN index on the column."
+  },
+  {
+    "question": "Which index type is typically used to speed up JSONB containment queries (@>) or full-text search?",
+    "a": "GIN (Generalized Inverted Index)",
+    "b": "BRIN",
+    "c": "B-tree",
+    "d": "Hash",
+    "correctAnswer": "a",
+    "explanation": "GIN indexes are designed for composite/multi-valued types like JSONB, arrays, and tsvector, indexing individual elements/keys rather than the whole value, making containment and search queries fast."
+  },
+  {
+    "question": "What does the array containment operator @> do for two integer arrays, e.g. `ARRAY[1,2,3] @> ARRAY[2,3]`?",
+    "a": "Raises a type error",
+    "b": "Concatenates the arrays",
+    "c": "Evaluates to true, since the left array contains all elements of the right array",
+    "d": "Evaluates to false, since order differs",
+    "correctAnswer": "c",
+    "explanation": "The @> operator on arrays checks whether every element of the right-hand array is present in the left-hand array, regardless of order."
+  },
+  {
+    "question": "How do you check whether a specific value exists within an array column in PostgreSQL?",
+    "a": "WHERE tags CONTAINS 5",
+    "b": "WHERE tags.includes(5)",
+    "c": "WHERE 5 IN (tags)",
+    "d": "WHERE 5 = ANY(tags)",
+    "correctAnswer": "d",
+    "explanation": "ANY(array_column) lets you compare a scalar against each element of an array; = ANY(tags) is true if 5 matches any element. IN expects a list/subquery, not an array value directly."
+  },
+  {
+    "question": "What does UNNEST(array_column) do?",
+    "a": "Expands an array into a set of rows, one per element",
+    "b": "Counts the array's elements",
+    "c": "Sorts the array",
+    "d": "Merges nested arrays into one level",
+    "correctAnswer": "a",
+    "explanation": "UNNEST turns an array value into a table-like set of rows (a 'set-returning function'), often used in a FROM or LATERAL context to join against each array element individually."
+  },
+  {
+    "question": "What is a LATERAL join used for?",
+    "a": "Joining two tables without any condition",
+    "b": "Allowing a subquery in the FROM clause to reference columns from preceding tables in the same FROM list, e.g. computing a per-row top-N",
+    "c": "Sorting joined results laterally instead of vertically",
+    "d": "Replacing GROUP BY",
+    "correctAnswer": "b",
+    "explanation": "A LATERAL subquery can reference columns from tables listed earlier in the same FROM clause, enabling patterns like 'for each customer, the 3 most recent orders' that a plain subquery in FROM cannot express."
+  },
+  {
+    "question": "Why can't a normal (non-LATERAL) subquery in FROM reference columns from a sibling table in the same FROM list?",
+    "a": "It's a PostgreSQL bug scheduled to be fixed",
+    "b": "A regular FROM-clause subquery is evaluated independently of other FROM items, before any correlation is possible — LATERAL explicitly permits that correlation",
+    "c": "Because subqueries in FROM must always return a single row",
+    "d": "There's no such restriction; LATERAL is unnecessary",
+    "correctAnswer": "b",
+    "explanation": "Without LATERAL, each FROM-clause item is planned as an independent, uncorrelated relation; LATERAL is exactly the keyword that lifts this restriction, letting the subquery act like a per-row function call."
+  },
+  {
+    "question": "What does CREATE VIEW customer_totals AS SELECT ... define?",
+    "a": "A materialized snapshot that never updates",
+    "b": "A physical copy of the query's result, refreshed on a timer",
+    "c": "A stored, named query definition that re-executes its underlying SQL each time the view is queried",
+    "d": "An index on a computed expression",
+    "correctAnswer": "c",
+    "explanation": "A regular (non-materialized) VIEW is just a saved query — PostgreSQL re-runs the underlying SELECT each time the view is referenced, so it always reflects current data."
+  },
+  {
+    "question": "How does a MATERIALIZED VIEW differ from a regular VIEW?",
+    "a": "Materialized views cannot be indexed",
+    "b": "Materialized views update automatically on every underlying INSERT",
+    "c": "A materialized view physically stores its result set on disk and must be explicitly refreshed (REFRESH MATERIALIZED VIEW) to reflect underlying data changes",
+    "d": "No difference besides naming",
+    "correctAnswer": "c",
+    "explanation": "Unlike a regular view, a materialized view caches the query's result physically, trading staleness (until refreshed) for much faster reads on expensive queries."
+  },
+  {
+    "question": "What does `REFRESH MATERIALIZED VIEW CONCURRENTLY` require to work?",
+    "a": "Nothing extra, it always works",
+    "b": "The view must have no joins",
+    "c": "It must be run inside a transaction block",
+    "d": "A unique index must exist on the materialized view so PostgreSQL can update it without fully locking it against reads",
+    "correctAnswer": "d",
+    "explanation": "CONCURRENTLY avoids taking an exclusive lock (so the view remains queryable during refresh), but it requires at least one UNIQUE index on the materialized view to compute the differences row-by-row."
+  },
+  {
+    "question": "What is the effect of adding a NOT NULL constraint to an existing column with `ALTER TABLE ... ALTER COLUMN ... SET NOT NULL`?",
+    "a": "PostgreSQL validates that no existing row currently has NULL in that column, and fails the ALTER if any do",
+    "b": "It only applies to future inserts, not existing rows",
+    "c": "Existing NULL values are automatically replaced with a default",
+    "d": "It silently ignores any existing NULLs",
+    "correctAnswer": "a",
+    "explanation": "SET NOT NULL performs a full table scan (in older versions) or check (using existing CHECK constraints in newer versions) to ensure no current row violates the new constraint before applying it."
+  },
+  {
+    "question": "Why can adding a column with `ALTER TABLE big_table ADD COLUMN flag boolean NOT NULL DEFAULT false;` be problematic on very old PostgreSQL versions (pre-11), but fine on modern ones?",
+    "a": "Pre-11, adding a NOT NULL column with a default rewrote the entire table; PostgreSQL 11+ can add it as metadata-only when the default is constant",
+    "b": "It only affects indexes, never the table itself",
+    "c": "It was never possible before version 11",
+    "d": "It's always instantaneous regardless of version",
+    "correctAnswer": "a",
+    "explanation": "Since PostgreSQL 11, adding a column with a constant DEFAULT is a fast, metadata-only change; earlier versions had to rewrite every existing row to populate the new column, which could lock a large table for a long time."
+  },
+  {
+    "question": "What does `ALTER TABLE orders ADD CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id) NOT VALID;` followed later by `VALIDATE CONSTRAINT fk_customer;` achieve?",
+    "a": "It's equivalent to just skipping the constraint entirely",
+    "b": "NOT VALID disables the constraint for all future writes too",
+    "c": "It creates an invalid, unusable constraint permanently",
+    "d": "It adds the constraint without immediately checking existing rows (enforced only for new/changed rows), letting you validate existing data separately without a long exclusive lock during the ADD step",
+    "correctAnswer": "d",
+    "explanation": "NOT VALID lets you add a constraint quickly (only a brief lock, and it applies to new/updated rows going forward); VALIDATE CONSTRAINT later scans existing rows with a lighter lock to confirm compliance, splitting a potentially long operation into two less disruptive steps."
+  },
+  {
+    "question": "What does the CASCADE option do in `ALTER TABLE customers DROP COLUMN id CASCADE;` or when dropping a referenced object?",
+    "a": "Prevents the drop if anything depends on it",
+    "b": "Archives the dropped data instead of deleting it",
+    "c": "Cascades the drop to all schemas in the database",
+    "d": "Automatically drops any dependent objects (like views or foreign keys) that rely on the thing being dropped",
+    "correctAnswer": "d",
+    "explanation": "CASCADE tells PostgreSQL to also drop dependent objects rather than erroring out; the default (RESTRICT) refuses the drop if anything else depends on the target."
+  },
+  {
+    "question": "What does TRUNCATE ... RESTART IDENTITY do differently from a plain TRUNCATE?",
+    "a": "It also resets any identity/serial sequences owned by the table back to their starting value",
+    "b": "Nothing different",
+    "c": "It restores identity columns' previous values",
+    "d": "It restarts the whole database",
+    "correctAnswer": "a",
+    "explanation": "By default TRUNCATE leaves sequences untouched; RESTART IDENTITY additionally resets sequences tied to the table's identity/serial columns back to their initial value."
+  },
+  {
+    "question": "What is the practical difference between UNION ALL and simply running two separate SELECT queries?",
+    "a": "Two separate SELECTs are always faster",
+    "b": "None, they're identical",
+    "c": "UNION ALL combines both result sets into a single result set/ordering in one statement, which is often needed for e.g. a single ORDER BY/LIMIT applied across both sources",
+    "d": "UNION ALL is only for INSERT statements",
+    "correctAnswer": "c",
+    "explanation": "UNION ALL merges two queries into one combined result, useful when you need overall ordering, pagination, or aggregation across both sources in a single statement rather than as two disconnected result sets."
+  },
+  {
+    "question": "What's a common gotcha when combining ORDER BY with UNION/UNION ALL across two SELECTs?",
+    "a": "UNION automatically ignores ORDER BY",
+    "b": "ORDER BY is not allowed at all with UNION",
+    "c": "ORDER BY must be repeated after each SELECT",
+    "d": "A single ORDER BY only belongs at the very end and applies to the combined result — you can't meaningfully attach a separate ORDER BY to each branch except via a wrapping subquery with LIMIT",
+    "correctAnswer": "d",
+    "explanation": "In a UNION query, ORDER BY (and LIMIT) apply once to the whole combined result set at the end; if you need per-branch ordering before combining (e.g. taking top-N from each), each branch must be wrapped in its own subquery."
+  },
+  {
+    "question": "Why must column names/aliases in a UNION's second SELECT match (or be positional to) the first SELECT's output?",
+    "a": "They don't need to match at all",
+    "b": "The final result set's column names come from the first SELECT; PostgreSQL matches columns positionally across the unioned queries, not by name",
+    "c": "Only the last SELECT's names are used",
+    "d": "PostgreSQL renames columns automatically based on data type",
+    "correctAnswer": "b",
+    "explanation": "UNION combines rows positionally: the Nth column of every branch must be type-compatible, and the overall result's column names are taken from the first SELECT, regardless of what the later branches call their columns."
+  },
+  {
+    "question": "What does `SELECT to_char(created_at, 'YYYY-MM')` typically produce?",
+    "a": "An integer representing days since epoch",
+    "b": "An error, since to_char only accepts numbers",
+    "c": "A formatted text string like '2026-03', grouping-friendly for a month bucket",
+    "d": "A TIMESTAMP value",
+    "correctAnswer": "c",
+    "explanation": "to_char() formats date/time (or numeric) values into text according to a format pattern, commonly used to bucket timestamps into text labels like year-month for reporting."
+  },
+  {
+    "question": "What does `date_trunc('month', created_at)` return?",
+    "a": "A timestamp rounded down to the first moment of that month, keeping the same data type as the input",
+    "b": "The month name as text",
+    "c": "The number of days remaining in the month",
+    "d": "An integer for the month number",
+    "correctAnswer": "a",
+    "explanation": "date_trunc truncates a timestamp to the specified precision (e.g. 'month', 'day', 'hour'), returning a timestamp value — often preferred over to_char for grouping because it stays sortable/comparable as a real date."
+  },
+  {
+    "question": "Why is `date_trunc('month', created_at)` generally preferred over `to_char(created_at, 'YYYY-MM')` for GROUP BY when you also need chronological ORDER BY?",
+    "a": "date_trunc is deprecated in favor of to_char",
+    "b": "to_char cannot be used in GROUP BY at all",
+    "c": "date_trunc's result is still a timestamp, so it sorts chronologically by default; to_char's text output sorts lexicographically, which happens to match here but breaks for formats like month names",
+    "d": "There's no difference in behavior",
+    "correctAnswer": "c",
+    "explanation": "Because date_trunc preserves the timestamp type, ORDER BY naturally sorts chronologically; text-formatted buckets sort as strings, which can silently produce wrong ordering for some formats (e.g. month names 'April' before 'January')."
+  },
+  {
+    "question": "What does INTERVAL '1 day' let you do in an expression like `created_at + INTERVAL '1 day'`?",
+    "a": "Convert created_at into an integer",
+    "b": "Add a duration to a date/timestamp, producing a new date/timestamp shifted by that amount",
+    "c": "Truncate created_at to whole days",
+    "d": "Nothing, it's invalid syntax",
+    "correctAnswer": "b",
+    "explanation": "INTERVAL represents a span of time and can be added to or subtracted from date/timestamp values, correctly handling things like month-length variation and daylight saving where relevant."
+  },
+  {
+    "question": "What is a common pitfall when filtering `WHERE created_at = CURRENT_DATE` on a TIMESTAMP column that includes time-of-day?",
+    "a": "It works correctly for all rows on that date",
+    "b": "It only matches rows with exactly midnight (00:00:00) timestamps, missing every other time that day",
+    "c": "It always raises a type mismatch error",
+    "d": "CURRENT_DATE cannot be compared to a timestamp at all",
+    "correctAnswer": "b",
+    "explanation": "CURRENT_DATE is implicitly cast to midnight of that date when compared to a timestamp, so an exact equality check misses every row with a non-midnight time; a range condition (>= start AND < next day) or date_trunc is needed instead."
+  },
+  {
+    "question": "What does CAST(price AS integer) (or price::integer) do to a value like 19.7?",
+    "a": "Rounds to the nearest integer (20), following PostgreSQL's numeric-to-integer cast rounding rules",
+    "b": "Raises an error",
+    "c": "Truncates toward zero to 19 always",
+    "d": "Converts it to text '19.7'",
+    "correctAnswer": "a",
+    "explanation": "Casting a NUMERIC or floating-point value to an integer type in PostgreSQL rounds to the nearest integer (round-half-to-even for exact ties in some cases), unlike languages where int() truncates toward zero."
+  },
+  {
+    "question": "What's the risk of relying on implicit type coercion in a WHERE clause, e.g. comparing a TEXT column to an integer literal that PostgreSQL happens to cast automatically?",
+    "a": "PostgreSQL refuses to run such queries",
+    "b": "There's no risk; PostgreSQL always coerces safely and efficiently",
+    "c": "Implicit casts can prevent an index on that column from being used, and can silently produce different matching behavior than intended",
+    "d": "It always throws a runtime error",
+    "correctAnswer": "c",
+    "explanation": "Depending on the cast direction and column indexing, comparing mismatched types can defeat index usage (function/cast applied to the indexed column) or produce subtly wrong matches — being explicit about types avoids relying on planner-specific coercion behavior."
+  },
+  {
+    "question": "What's the difference between VARCHAR(n) and CHAR(n) in PostgreSQL when storing a shorter string?",
+    "a": "CHAR(n) pads the stored value with trailing spaces up to length n; VARCHAR(n) stores the string as-is up to the limit",
+    "b": "VARCHAR(n) pads with spaces, CHAR(n) does not",
+    "c": "They behave identically in every respect",
+    "d": "CHAR(n) cannot store strings shorter than n",
+    "correctAnswer": "a",
+    "explanation": "CHAR(n) (fixed-length, blank-padded) pads shorter values with trailing spaces on storage and typically strips them on retrieval comparisons in some contexts, which can cause subtle string-equality surprises; VARCHAR(n) stores only the actual characters up to the length limit."
+  },
+  {
+    "question": "Why is CHAR(n) rarely recommended in modern PostgreSQL usage?",
+    "a": "It offers no performance benefit over VARCHAR/TEXT in PostgreSQL and the padding behavior is a frequent source of subtle bugs",
+    "b": "It doesn't exist in PostgreSQL",
+    "c": "It cannot be indexed",
+    "d": "It's faster than TEXT for all operations",
+    "correctAnswer": "a",
+    "explanation": "Unlike some other databases, PostgreSQL's TEXT/VARCHAR storage is efficient regardless of fixed vs. variable length, so CHAR(n)'s padding behavior brings surprises (like trailing-space handling) without a compensating performance advantage."
+  },
+  {
+    "question": "What is the purpose of a sequence object in PostgreSQL, e.g. as used by SERIAL or GENERATED AS IDENTITY?",
+    "a": "Stores an ordered list of foreign keys",
+    "b": "Sorts rows automatically",
+    "c": "Defines the order of columns in a table",
+    "d": "Generates a series of unique numeric values, typically used to produce auto-incrementing primary key values",
+    "correctAnswer": "d",
+    "explanation": "A SEQUENCE is a standalone database object that generates a series of numbers (via nextval()), and SERIAL/IDENTITY columns are essentially syntactic sugar wiring a column's default to such a sequence."
+  },
+  {
+    "question": "Why might there be gaps in a SERIAL/IDENTITY column's values after some inserts fail or transactions roll back?",
+    "a": "Sequence values are allocated outside of transactional rollback — once nextval() is called, that number is 'used up' even if the surrounding transaction is rolled back",
+    "b": "PostgreSQL guarantees no gaps ever occur",
+    "c": "Gaps only happen due to database corruption",
+    "d": "Only DELETE statements cause gaps",
+    "correctAnswer": "a",
+    "explanation": "Sequences are intentionally non-transactional for performance/concurrency reasons: a rolled-back INSERT doesn't give its consumed sequence value back, so gaps in the numbering are expected and normal, not a bug."
+  },
+  {
+    "question": "What does `SELECT setval('orders_id_seq', 1000);` do?",
+    "a": "Manually sets the sequence's current value, affecting subsequent nextval() calls",
+    "b": "Deletes the sequence",
+    "c": "Creates 1000 new rows",
+    "d": "Renames the sequence",
+    "correctAnswer": "a",
+    "explanation": "setval() explicitly sets a sequence's internal counter, sometimes needed after bulk-loading data with explicit IDs to avoid future collisions with auto-generated values."
+  },
+  {
+    "question": "What is the effect of `SELECT * FROM orders WHERE customer_id = 5 FOR UPDATE SKIP LOCKED;`?",
+    "a": "It waits indefinitely for any locked matching rows to become free",
+    "b": "It returns only the matching rows that are not currently locked by another transaction, skipping locked ones instead of waiting",
+    "c": "It's equivalent to a plain SELECT with no locking",
+    "d": "It locks every row in the table",
+    "correctAnswer": "b",
+    "explanation": "SKIP LOCKED is commonly used for job-queue style patterns, letting multiple workers concurrently pull different unlocked rows without blocking on rows another worker is already processing."
+  },
+  {
+    "question": "What is the purpose of the `pg_stat_activity` view?",
+    "a": "Lists all indexes in the database",
+    "b": "Shows currently running backend processes/connections and what they're executing right now",
+    "c": "Stores historical query logs permanently",
+    "d": "Tracks table row counts",
+    "correctAnswer": "b",
+    "explanation": "pg_stat_activity is a system view exposing live information about each active database connection/session, including its current query, state, and wait status — useful for diagnosing long-running or blocked queries."
+  },
+  {
+    "question": "What does UPDATE orders o SET total = s.sum FROM (SELECT order_id, SUM(price) AS sum FROM order_items GROUP BY order_id) s WHERE o.id = s.order_id; accomplish?",
+    "a": "Creates a new table called s",
+    "b": "Is invalid syntax; UPDATE cannot use FROM",
+    "c": "Deletes orders with no matching items",
+    "d": "Updates each order's total column using an aggregated value computed from a joined subquery",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL's UPDATE ... FROM extension lets you join the updated table against other tables/subqueries, using their columns to compute the new values — here a per-order total from order_items."
+  },
+  {
+    "question": "What does DELETE FROM sessions s USING users u WHERE s.user_id = u.id AND u.active = false; do?",
+    "a": "Deletes all users",
+    "b": "Is a syntax error",
+    "c": "Deletes rows from both tables",
+    "d": "Deletes sessions belonging to users who are inactive, using a join via USING",
+    "correctAnswer": "d",
+    "explanation": "DELETE ... USING lets you reference another table in the WHERE condition (like a join) to decide which rows of the target table to delete, without needing a subquery."
+  },
+  {
+    "question": "What does STRING_AGG(name, ', ') combined with GROUP BY produce?",
+    "a": "A single concatenated string per group, joining each group's name values with the given separator",
+    "b": "An array of names",
+    "c": "The count of names per group",
+    "d": "The longest name per group",
+    "correctAnswer": "a",
+    "explanation": "STRING_AGG is an aggregate function that concatenates text values within a group into one string, separated by the given delimiter — useful for turning rows into a comma-separated summary."
+  },
+  {
+    "question": "What does ARRAY_AGG(id) do as an aggregate function?",
+    "a": "Returns the sum of all id values",
+    "b": "Collects all id values in a group into a PostgreSQL array",
+    "c": "Removes duplicate ids",
+    "d": "Sorts ids in the table permanently",
+    "correctAnswer": "b",
+    "explanation": "ARRAY_AGG gathers the values from each row in a group into a single array value, often paired with GROUP BY to bundle related rows together."
+  },
+  {
+    "question": "What does `SELECT generate_series(1, 5);` produce?",
+    "a": "The value 5 only",
+    "b": "An error, since generate_series only works with dates",
+    "c": "Five rows, each containing one integer from 1 to 5",
+    "d": "A single row containing the array [1,2,3,4,5]",
+    "correctAnswer": "c",
+    "explanation": "generate_series is a set-returning function; used in a SELECT it produces one row per value in the series, here five rows numbered 1 through 5."
+  },
+  {
+    "question": "What is `generate_series('2026-01-01'::date, '2026-01-03'::date, '1 day')` useful for?",
+    "a": "Producing a row per calendar day in the range, handy for filling in dates with zero activity when left-joined against real data",
+    "b": "Formatting a single date as text",
+    "c": "Nothing, it's invalid with dates",
+    "d": "Deleting rows between two dates",
+    "correctAnswer": "a",
+    "explanation": "generate_series also supports timestamp/date step ranges, commonly used to generate a complete calendar and LEFT JOIN it against sparse data so days with no rows still appear with zero/NULL aggregates."
+  },
+  {
+    "question": "What does EXTRACT(YEAR FROM created_at) return?",
+    "a": "A formatted string like '2026'",
+    "b": "A numeric value representing just the year component of the date/timestamp",
+    "c": "The full timestamp",
+    "d": "The number of years since the epoch",
+    "correctAnswer": "b",
+    "explanation": "EXTRACT(field FROM source) pulls out a specific numeric subfield (year, month, day, hour, dow, etc.) from a date/time value, returning it as a number rather than text."
+  },
+  {
+    "question": "What is the difference between EXTRACT(DOW FROM date) and EXTRACT(ISODOW FROM date)?",
+    "a": "DOW numbers Sunday as 0 through Saturday as 6; ISODOW numbers Monday as 1 through Sunday as 7",
+    "b": "DOW only works with TIMESTAMPTZ",
+    "c": "No difference",
+    "d": "ISODOW returns a day name string",
+    "correctAnswer": "a",
+    "explanation": "DOW follows the traditional 0=Sunday convention while ISODOW follows the ISO 8601 standard where the week starts at Monday (1) and Sunday is 7, which matters when writing 'is this a weekday' logic."
+  },
+  {
+    "question": "What does `WITH a AS (...), b AS (SELECT * FROM a WHERE ...) SELECT * FROM b;` demonstrate?",
+    "a": "Only the last CTE listed is actually used",
+    "b": "This always causes infinite recursion",
+    "c": "CTEs cannot reference each other",
+    "d": "A later CTE in the same WITH clause can reference an earlier one, building a pipeline of named steps",
+    "correctAnswer": "d",
+    "explanation": "Multiple CTEs in one WITH clause can be chained, with later ones referencing earlier ones (but not the reverse, except in WITH RECURSIVE), letting you break a complex query into readable named stages."
+  },
+  {
+    "question": "What does INSERT INTO archive_orders SELECT * FROM orders WHERE created_at < NOW() - INTERVAL '1 year'; do?",
+    "a": "Is invalid; INSERT requires VALUES",
+    "b": "Deletes old orders",
+    "c": "Copies rows matching the condition from orders into archive_orders, using a SELECT as the row source instead of VALUES",
+    "d": "Creates a foreign key between the two tables",
+    "correctAnswer": "c",
+    "explanation": "INSERT INTO ... SELECT ... is a standard way to bulk-copy rows from a query's result set into another table, as an alternative to listing literal VALUES."
+  },
+  {
+    "question": "What does `SELECT COALESCE(SUM(amount), 0) FROM payments WHERE customer_id = 5;` protect against, if that customer has zero matching rows?",
+    "a": "SUM() over zero rows returns NULL, not 0, so COALESCE substitutes a usable default",
+    "b": "It prevents a syntax error",
+    "c": "It forces the query to return multiple rows",
+    "d": "Nothing extra; SUM already returns 0 for no rows",
+    "correctAnswer": "a",
+    "explanation": "Aggregate functions like SUM (unlike COUNT) return NULL when there are no input rows to aggregate, which can silently propagate as NULL downstream (e.g. in further arithmetic) unless wrapped in COALESCE."
+  },
+  {
+    "question": "What is the effect of `COPY orders TO '/tmp/orders.csv' WITH (FORMAT csv, HEADER true);`?",
+    "a": "Backs up the entire database",
+    "b": "Creates a materialized view named orders.csv",
+    "c": "Exports the table's data to a CSV file on the server's filesystem, including a header row",
+    "d": "Copies the table to another table in the same database",
+    "correctAnswer": "c",
+    "explanation": "COPY is PostgreSQL's fast bulk data transfer command; TO exports table data to a file (or program/STDOUT) in the specified format, and HEADER true includes column names as the first line."
+  }
+]

@@ -18,6 +18,7 @@ import OfflineIcon from "../assets/icons/OfflineIcon.astro";
 import SockerIoIcon from "../assets/icons/SockerIoIcon.astro";
 import GrafanaIcon from "../assets/icons/GrafanaIcon.astro";
 import NestjsIcon from "../assets/icons/NestjsIcon.astro";
+import PostgreSQLIcon from "../assets/icons/PostgreSQLIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -41,7 +42,8 @@ const iconList = new Map([
     ["offline-support", OfflineIcon],
     ["socketio", SockerIoIcon],
     ["grafana", GrafanaIcon],
-    ["nestjs-di", NestjsIcon]
+    ["nestjs-di", NestjsIcon],
+    ["postgre-sql", PostgreSQLIcon]
     // Add more mappings as needed
 ]);
 

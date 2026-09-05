@@ -1,0 +1,423 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getLang } from "../../../i18n";
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: "en" } },
+    { params: { lang: "hu" } }
+  ];
+}
+
+const { lang } = Astro.params;
+const t = getLang(lang);
+---
+
+<Layout lang={lang} title={t.sqlQuiz.metaTitle} description={t.sqlQuiz.metaDescription}>
+  <div class="inner-container sql-quiz">
+    <section id="level-select">
+      <h1>{t.sqlQuiz.heading}</h1>
+      <p class="intro">{t.sqlQuiz.intro}</p>
+      <h2>{t.sqlQuiz.levelSelect.heading}</h2>
+      <div class="level-cards">
+        <button type="button" class="level-card" data-level="beginner">
+          <h3>{t.sqlQuiz.levelSelect.beginnerLabel}</h3>
+          <p>{t.sqlQuiz.levelSelect.beginnerDescription}</p>
+          <span class="start-label">{t.sqlQuiz.levelSelect.startButton}</span>
+        </button>
+        <button type="button" class="level-card" data-level="intermediate">
+          <h3>{t.sqlQuiz.levelSelect.intermediateLabel}</h3>
+          <p>{t.sqlQuiz.levelSelect.intermediateDescription}</p>
+          <span class="start-label">{t.sqlQuiz.levelSelect.startButton}</span>
+        </button>
+        <button type="button" class="level-card" data-level="expert">
+          <h3>{t.sqlQuiz.levelSelect.expertLabel}</h3>
+          <p>{t.sqlQuiz.levelSelect.expertDescription}</p>
+          <span class="start-label">{t.sqlQuiz.levelSelect.startButton}</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="quiz-runner" hidden>
+      <p id="quiz-progress" class="progress"></p>
+      <h2 id="quiz-question"></h2>
+      <div class="answer-list">
+        <button type="button" class="answer-option" data-choice="a"></button>
+        <button type="button" class="answer-option" data-choice="b"></button>
+        <button type="button" class="answer-option" data-choice="c"></button>
+        <button type="button" class="answer-option" data-choice="d"></button>
+      </div>
+      <div id="quiz-feedback-block" class="feedback-block" hidden>
+        <p id="quiz-feedback-text" class="feedback-text"></p>
+        <div class="explanation-box">
+          <strong>{t.sqlQuiz.quiz.explanationLabel}</strong>
+          <p id="quiz-explanation-text"></p>
+        </div>
+        <button type="button" id="next-question-btn">{t.sqlQuiz.quiz.nextButton}</button>
+      </div>
+      <div id="quiz-feedback-skeleton" class="feedback-skeleton"></div>
+    </section>
+
+    <section id="results" hidden>
+      <h2>{t.sqlQuiz.results.heading}</h2>
+      <p id="quiz-score" class="score"></p>
+      <div class="results-actions">
+        <button type="button" id="play-again-btn">{t.sqlQuiz.results.playAgainButton}</button>
+        <button type="button" id="change-level-btn">{t.sqlQuiz.results.changeLevelButton}</button>
+      </div>
+    </section>
+
+    <div
+      id="quiz-i18n"
+      hidden
+      data-correct={t.sqlQuiz.quiz.correctFeedback}
+      data-incorrect={t.sqlQuiz.quiz.incorrectFeedback}
+      data-progress-template={t.sqlQuiz.quiz.progressTemplate}
+      data-score-template={t.sqlQuiz.results.scoreTemplate}
+    ></div>
+  </div>
+</Layout>
+
+<script>
+  import beginnerQuestions from './beginner.json';
+  import intermediateQuestions from './intermediate.json';
+  import expertQuestions from './expert.json';
+
+  type Choice = 'a' | 'b' | 'c' | 'd';
+
+  interface Question {
+    question: string;
+    a: string;
+    b: string;
+    c: string;
+    d: string;
+    correctAnswer: Choice;
+    explanation: string;
+  }
+
+  const POOLS: Record<string, Question[]> = {
+    beginner: beginnerQuestions as Question[],
+    intermediate: intermediateQuestions as Question[],
+    expert: expertQuestions as Question[],
+  };
+
+  const QUESTIONS_PER_QUIZ = 15;
+
+  window.addEventListener('load', () => {
+    const levelSelect = document.getElementById('level-select');
+    const quizRunner = document.getElementById('quiz-runner');
+    const results = document.getElementById('results');
+    const progressEl = document.getElementById('quiz-progress');
+    const questionEl = document.getElementById('quiz-question');
+    const feedbackBlock = document.getElementById('quiz-feedback-block');
+    const feedbackSkeleton = document.getElementById('quiz-feedback-skeleton');
+    const feedbackText = document.getElementById('quiz-feedback-text');
+    const explanationText = document.getElementById('quiz-explanation-text');
+    const nextBtn = document.getElementById('next-question-btn');
+    const scoreEl = document.getElementById('quiz-score');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const changeLevelBtn = document.getElementById('change-level-btn');
+    const i18nEl = document.getElementById('quiz-i18n');
+    const answerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.answer-option'));
+    const levelCards = Array.from(document.querySelectorAll<HTMLButtonElement>('.level-card'));
+
+    if (
+      !levelSelect || !quizRunner || !results || !progressEl || !questionEl ||
+      !feedbackBlock || !feedbackText || !explanationText || !nextBtn ||
+      !scoreEl || !playAgainBtn || !changeLevelBtn || !i18nEl
+    ) {
+      return;
+    }
+
+    const strings = {
+      correct: i18nEl.dataset.correct || 'Correct!',
+      incorrect: i18nEl.dataset.incorrect || 'Incorrect',
+      progressTemplate: i18nEl.dataset.progressTemplate || 'Question {current} of {total}',
+      scoreTemplate: i18nEl.dataset.scoreTemplate || 'You scored {score} out of {total}',
+    };
+
+    let state: {
+      level: string;
+      questions: Question[];
+      index: number;
+      score: number;
+      answered: boolean;
+    } = { level: '', questions: [], index: 0, score: 0, answered: false };
+
+    function shuffle<T>(arr: T[]): T[] {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function showSection(name: 'level-select' | 'quiz' | 'results') {
+      levelSelect!.hidden = name !== 'level-select';
+      quizRunner!.hidden = name !== 'quiz';
+      results!.hidden = name !== 'results';
+    }
+
+    function renderQuestion() {
+      const current = state.questions[state.index];
+      if (!current) return;
+
+      questionEl!.textContent = current.question;
+      answerButtons.forEach((btn) => {
+        const choice = btn.dataset.choice as Choice;
+        btn.textContent = current[choice];
+        btn.classList.remove('correct', 'incorrect');
+        btn.disabled = false;
+      });
+
+      feedbackBlock!.hidden = true;
+      feedbackSkeleton!.hidden = false;
+      state.answered = false;
+
+      progressEl!.textContent = strings.progressTemplate
+        .replace('{current}', String(state.index + 1))
+        .replace('{total}', String(state.questions.length));
+    }
+
+    function selectAnswer(choice: Choice) {
+      if (state.answered) return;
+      state.answered = true;
+
+      const current = state.questions[state.index];
+      const isCorrect = choice === current.correctAnswer;
+      if (isCorrect) state.score++;
+
+      answerButtons.forEach((btn) => {
+        const btnChoice = btn.dataset.choice as Choice;
+        btn.disabled = true;
+        if (btnChoice === current.correctAnswer) {
+          btn.classList.add('correct');
+        } else if (btnChoice === choice) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      feedbackText!.textContent = isCorrect ? strings.correct : strings.incorrect;
+      feedbackText!.classList.toggle('is-correct', isCorrect);
+      feedbackText!.classList.toggle('is-incorrect', !isCorrect);
+      explanationText!.textContent = current.explanation;
+      feedbackBlock!.hidden = false;
+      feedbackSkeleton!.hidden = true;
+    }
+
+    function nextQuestion() {
+      state.index++;
+      if (state.index >= state.questions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResults() {
+      showSection('results');
+      scoreEl!.textContent = strings.scoreTemplate
+        .replace('{score}', String(state.score))
+        .replace('{total}', String(state.questions.length));
+    }
+
+    function startQuiz(level: string) {
+      const pool = POOLS[level];
+      if (!pool) return;
+      state = {
+        level,
+        questions: shuffle(pool).slice(0, QUESTIONS_PER_QUIZ),
+        index: 0,
+        score: 0,
+        answered: false,
+      };
+      showSection('quiz');
+      renderQuestion();
+    }
+
+    levelCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const level = card.dataset.level;
+        if (level) startQuiz(level);
+      });
+    });
+
+    answerButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const choice = btn.dataset.choice as Choice | undefined;
+        if (choice) selectAnswer(choice);
+      });
+    });
+
+    nextBtn.addEventListener('click', nextQuestion);
+    playAgainBtn.addEventListener('click', () => startQuiz(state.level));
+    changeLevelBtn.addEventListener('click', () => showSection('level-select'));
+  });
+</script>
+
+<style>
+  .sql-quiz {
+    padding-top: 1rem;
+    padding-bottom: 3rem;
+  }
+
+  .intro {
+    margin-bottom: 3.5rem;
+  }
+
+  .level-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 800px) {
+    .level-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .level-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    padding: 1.25rem;
+    border: 1px solid var(--main-bg-color-lightest);
+    border-radius: var(--border-radius);
+    background: white;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .level-card h3 {
+    margin: 0;
+  }
+
+  .level-card .start-label {
+    margin-top: auto;
+    font-weight: 700;
+    color: var(--main-bg-color);
+  }
+
+  .level-card:hover,
+  .level-card:focus-visible {
+    background-color: var(--main-bg-color-light);
+    color: var(--soft-white);
+    border-color: var(--main-bg-color-light);
+  }
+
+  .level-card:hover h3,
+  .level-card:focus-visible h3,
+  .level-card:hover .start-label,
+  .level-card:focus-visible .start-label {
+    color: var(--soft-white);
+  }
+
+  .progress {
+    font-weight: 700;
+    color: var(--main-bg-color-light);
+  }
+
+  .answer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .answer-option {
+    text-align: left;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--main-bg-color-lightest);
+    border-radius: var(--border-radius);
+    background: white;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .answer-option:hover:not(:disabled),
+  .answer-option:focus-visible {
+    border-color: var(--main-bg-color);
+    background: var(--light-bg);
+  }
+
+  .answer-option:disabled {
+    cursor: default;
+  }
+
+  .answer-option.correct {
+    border-color: #2e7d32;
+    background: #e8f5e9;
+    color: #1b5e20;
+  }
+
+  .answer-option.incorrect {
+    border-color: #c62828;
+    background: #ffebee;
+    color: #b71c1c;
+  }
+
+  .feedback-block {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background: var(--light-bg);
+  }
+
+  .feedback-skeleton {
+    height: 226px;
+  }
+
+  .feedback-text {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .feedback-text.is-correct {
+    color: #1b5e20;
+  }
+
+  .feedback-text.is-incorrect {
+    color: #b71c1c;
+  }
+
+  .explanation-box {
+    margin: 0.75rem 0 1rem;
+  }
+
+  .score {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  #next-question-btn,
+  .results-actions button {
+    padding: 0.7rem 1.4rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--main-bg-color);
+    color: white;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  #next-question-btn:hover,
+  .results-actions button:hover,
+  #next-question-btn:focus-visible,
+  .results-actions button:focus-visible {
+    background: var(--main-bg-color-light);
+  }
+
+  h2 {
+    min-height: 58px;
+  }
+</style>

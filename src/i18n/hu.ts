@@ -3,7 +3,7 @@ export default {
   nav: {
     blog: "Digitális kert",
     about: "Rólam",
-    projects: "Projektek"
+    projects: "Projektek",
   },
   digitalGarden: {
     definition: "A digitális kert folyamatosan fejlődő jegyzetek, ötletek és források nemlineáris gyűjteménye. Abban különbözik a blogoktól, hogy kevésbé szervezett, és idővel változhat, akár egy kert.",
@@ -30,5 +30,34 @@ export default {
     dyslexicMode: "Diszlexia barát szöveg bekapcsolása",
     dyslexicModeDisclaimer: "A preferenciád a böngésződ helyi tárába kerül mentésre, hogy oldalváltás esetén is megmaradjon. A gomb használatával elfogadod ezt a mentési módot. Erre a honlap üzemeltetője nem lát rá, nem menti más módon. A saját gépeden van.",
     settings: "Beállítások"
+  },
+  sqlQuiz: {
+    metaTitle: "SQL Kvíz | Simon Júlia - Web fejlesztő",
+    metaDescription: "Teszteld a PostgreSQL tudásod egy ingyenes, interaktív kvízzel kezdő, haladó és profi szinten.",
+    heading: "PostgreSQL SQL Kvíz",
+    intro: "Válassz egy nehézségi szintet egy 15 kérdéses PostgreSQL kvíz elindításához. (A kérdések angol nyelvűek.) Tanuld meg a helyes gondolkodásmódot, a kulcsszavakat és a buktatókat, hogy magabiztosan tudj lekérdezéseket tartalmazó PR-eket átnézni.",
+    levelSelect: {
+      heading: "Válassz szintet",
+      beginnerLabel: "Kezdő",
+      beginnerDescription: "Alapvető SELECT utasítások, szűrés, rendezés és egyszerű join-ok.",
+      intermediateLabel: "Haladó",
+      intermediateDescription: "Több táblás join-ok, allekérdezések, CTE-k és aggregálások.",
+      expertLabel: "Profi",
+      expertDescription: "Window függvények, indexelés, zárolás és kevésbé ismert kulcsszavak.",
+      startButton: "Kvíz indítása"
+    },
+    quiz: {
+      progressTemplate: "{current}. kérdés / {total}",
+      correctFeedback: "Helyes!",
+      incorrectFeedback: "Helytelen",
+      explanationLabel: "Magyarázat",
+      nextButton: "Következő kérdés"
+    },
+    results: {
+      heading: "Kvíz kész",
+      scoreTemplate: "{score} / {total} pontot értél el",
+      playAgainButton: "Újrajátszás",
+      changeLevelButton: "Másik szint választása"
+    }
   }
 };

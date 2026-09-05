@@ -1,0 +1,902 @@
+[
+  {
+    "question": "In `SELECT AVG(salary) OVER (ORDER BY hire_date) FROM employees;`, what subtle behavior catches people off guard about the default frame?",
+    "a": "It computes the average of the entire table for every row",
+    "b": "AVG cannot be used as a window function",
+    "c": "It computes a running average up to the current row (RANGE UNBOUNDED PRECEDING TO CURRENT ROW is the implicit default when ORDER BY is present), not a whole-partition average",
+    "d": "It throws an error without PARTITION BY",
+    "correctAnswer": "c",
+    "explanation": "Many people expect OVER (ORDER BY ...) with no PARTITION BY to average the whole set, but PostgreSQL's default frame with ORDER BY is a cumulative window ending at the current row — you need an explicit ROWS/RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING for a full-partition aggregate."
+  },
+  {
+    "question": "What is the practical difference between a ROWS frame and a RANGE frame in a window function, e.g. `SUM(x) OVER (ORDER BY y ROWS BETWEEN 1 PRECEDING AND CURRENT ROW)` vs the RANGE equivalent?",
+    "a": "They are always identical",
+    "b": "RANGE only works with dates",
+    "c": "ROWS cannot be combined with PRECEDING",
+    "d": "ROWS counts a fixed number of physical rows; RANGE groups 'peer' rows with equal ORDER BY values together, so ties are included/excluded as a whole group rather than by row count",
+    "correctAnswer": "d",
+    "explanation": "With RANGE, rows that tie on the ORDER BY expression are treated as a single peer group entering/leaving the frame together, which can include more or fewer physical rows than a ROWS frame with the same offset when duplicate ORDER BY values exist."
+  },
+  {
+    "question": "Can two window functions with different PARTITION BY/ORDER BY clauses appear in the same SELECT list?",
+    "a": "Yes, each OVER() clause is independent and can define its own partitioning/ordering",
+    "b": "No, only one window definition is allowed per query",
+    "c": "Only if they use the same WINDOW alias",
+    "d": "Only in a CTE",
+    "correctAnswer": "a",
+    "explanation": "A query can freely mix multiple window functions, each with its own OVER(...) specification computed independently, e.g. a running total ordered by date alongside a rank partitioned by category in the same SELECT."
+  },
+  {
+    "question": "What does the WINDOW clause let you do, e.g. `SELECT ... FROM t WINDOW w AS (PARTITION BY dept ORDER BY salary) SELECT rank() OVER w, sum(salary) OVER w`?",
+    "a": "Define a named window specification once and reuse it across multiple window function calls in the same query",
+    "b": "Nothing; WINDOW is not valid SQL",
+    "c": "Force the query into a single window/frame globally",
+    "d": "Create a materialized view",
+    "correctAnswer": "a",
+    "explanation": "The WINDOW clause avoids repeating an identical PARTITION BY/ORDER BY specification for several window functions, improving readability and reducing duplication."
+  },
+  {
+    "question": "What is a subtle gotcha with using ROW_NUMBER() to deduplicate rows and keeping only rn = 1 when the ORDER BY has ties?",
+    "a": "ROW_NUMBER() cannot be used with WHERE in an outer query",
+    "b": "Which specific tied row gets rn = 1 is not deterministic unless the ORDER BY fully disambiguates ties (e.g. by adding a unique tiebreaker column)",
+    "c": "There is no gotcha, ties never occur",
+    "d": "ROW_NUMBER() automatically excludes ties",
+    "correctAnswer": "b",
+    "explanation": "If the ORDER BY expression doesn't uniquely determine order (e.g. multiple rows share the same created_at), which row is assigned rn = 1 among the tied rows is arbitrary and can vary between runs/plans unless a tiebreaker (like id) is added."
+  },
+  {
+    "question": "What does NTILE(4) OVER (ORDER BY score) compute?",
+    "a": "A moving average over 4 rows",
+    "b": "Divides the ordered rows as evenly as possible into 4 groups (quartiles), labeling each row with its group number 1-4",
+    "c": "The 4th percentile value",
+    "d": "The top 4 rows by score",
+    "correctAnswer": "b",
+    "explanation": "NTILE(n) is a window function that buckets ordered rows into n approximately equal-sized groups, commonly used for computing quartiles/deciles."
+  },
+  {
+    "question": "What does PERCENT_RANK() OVER (ORDER BY score) return for the lowest-scoring row?",
+    "a": "1.0",
+    "b": "0.5",
+    "c": "NULL",
+    "d": "0.0",
+    "correctAnswer": "d",
+    "explanation": "PERCENT_RANK computes (rank - 1) / (total rows - 1), so the very first row in the ordering always gets exactly 0, and the last row always gets exactly 1."
+  },
+  {
+    "question": "What is the difference between FIRST_VALUE() and LAST_VALUE() when using the default window frame with ORDER BY?",
+    "a": "FIRST_VALUE requires PARTITION BY, LAST_VALUE does not",
+    "b": "FIRST_VALUE correctly returns the first row's value in the frame, but LAST_VALUE with the default frame (UNBOUNDED PRECEDING TO CURRENT ROW) returns the current row's value, not the true last row of the partition — a classic gotcha requiring an explicit frame",
+    "c": "They always return the same value",
+    "d": "LAST_VALUE is not a valid PostgreSQL function",
+    "correctAnswer": "b",
+    "explanation": "Because the default frame ends at CURRENT ROW, LAST_VALUE effectively returns 'the value at the current row' unless you widen the frame explicitly to `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING`, which trips up many people expecting the partition's actual last row."
+  },
+  {
+    "question": "What does `SELECT DISTINCT ON (customer_id) *, MAX(amount) OVER (PARTITION BY customer_id) FROM orders;` risk regarding correctness versus a plain GROUP BY MAX approach?",
+    "a": "There's no difference; both approaches are equally clear",
+    "b": "DISTINCT ON cannot be combined with window functions at all",
+    "c": "It mixes row-level and aggregate-level semantics: DISTINCT ON picks one arbitrary row per group while the window MAX is computed across the whole partition, which can be confusing to reason about and easy to misuse if you actually wanted the row containing the max value",
+    "d": "It always throws a syntax error",
+    "correctAnswer": "c",
+    "explanation": "This combination is legal but often a design smell: if the intent is 'the row with the maximum amount per customer', you'd typically use DISTINCT ON (customer_id) ORDER BY customer_id, amount DESC instead of pairing an unrelated DISTINCT ON row-selector with an independently-computed window aggregate."
+  },
+  {
+    "question": "In PostgreSQL, what does `SELECT * FROM t TABLESAMPLE BERNOULLI (10);` do?",
+    "a": "Returns the first 10% of rows by physical order",
+    "b": "Creates a materialized sample table permanently",
+    "c": "Returns exactly 10 rows",
+    "d": "Returns an approximate 10% random sample of the table's rows, evaluating each row independently with 10% probability",
+    "correctAnswer": "d",
+    "explanation": "TABLESAMPLE BERNOULLI scans the whole table but includes each row independently with the given probability, giving an approximate percentage rather than an exact row count; SYSTEM sampling is faster but samples by block instead of row, and is less statistically uniform."
+  },
+  {
+    "question": "What is the difference between TABLESAMPLE SYSTEM and TABLESAMPLE BERNOULLI?",
+    "a": "SYSTEM always returns more rows than BERNOULLI",
+    "b": "BERNOULLI is Oracle-only syntax not supported by PostgreSQL",
+    "c": "No difference in method, only naming",
+    "d": "SYSTEM samples whole disk pages/blocks (faster, less statistically random since rows in the same block are correlated); BERNOULLI evaluates every row independently (slower, more statistically uniform)",
+    "correctAnswer": "d",
+    "explanation": "SYSTEM sampling is cheaper because it can skip whole blocks without reading every row, but its randomness is at the block level rather than the row level, which can bias results if data isn't uniformly distributed within blocks."
+  },
+  {
+    "question": "What does LATERAL combined with a set-returning function like `CROSS JOIN LATERAL unnest(tags) AS t(tag)` let you do that a plain JOIN cannot?",
+    "a": "Only works for JSONB columns, not arrays",
+    "b": "Expand an array column per row into multiple rows while keeping access to that row's other columns, effectively a per-row flatMap",
+    "c": "Sort tags alphabetically",
+    "d": "Nothing extra; LATERAL is unnecessary with unnest",
+    "correctAnswer": "b",
+    "explanation": "LATERAL allows unnest(tags) to be evaluated once per outer row using that row's own tags value, producing one output row per array element paired with the other columns of the source row — the classic 'explode an array column' pattern."
+  },
+  {
+    "question": "What is a common use of `CROSS JOIN LATERAL (SELECT ... ORDER BY ... LIMIT 3) sub` after a customers table?",
+    "a": "It always returns exactly 3 rows regardless of customer",
+    "b": "Deduplicating the customers table",
+    "c": "It's invalid because LATERAL cannot use LIMIT",
+    "d": "Computing a per-customer 'top 3' result (e.g. most recent orders) — something a plain JOIN or GROUP BY cannot express directly",
+    "correctAnswer": "d",
+    "explanation": "This is the canonical LATERAL use case: a per-row correlated subquery with its own ORDER BY/LIMIT, letting you fetch e.g. the 3 most recent orders per customer without a window function and separate filtering step."
+  },
+  {
+    "question": "What does the GiST index type excel at compared to B-tree?",
+    "a": "Enforcing uniqueness constraints only",
+    "b": "Simple equality lookups on integers",
+    "c": "Indexing complex data types with notions of 'nearest neighbor' or overlap, like geometric types, ranges, and full-text search configurations",
+    "d": "It's strictly slower and offers no advantages",
+    "correctAnswer": "c",
+    "explanation": "GiST (Generalized Search Tree) supports operator classes for types where B-tree's strict ordering doesn't apply well, such as geometric containment/overlap, range types (&& overlap operator), and nearest-neighbor searches."
+  },
+  {
+    "question": "What is a BRIN index best suited for?",
+    "a": "Full-text search",
+    "b": "Enforcing foreign key constraints",
+    "c": "Random-access lookups on unsorted, high-cardinality columns",
+    "d": "Very large tables where the indexed column correlates strongly with physical row order (e.g. an ever-increasing timestamp on an append-only table), since BRIN stores only per-block value ranges and is extremely compact",
+    "correctAnswer": "d",
+    "explanation": "BRIN (Block Range Index) stores summary min/max info per block range rather than per row, making it tiny compared to B-tree, but it's only effective when the column's values are physically correlated with insertion/storage order — e.g. a naturally increasing timestamp column on an append-mostly table."
+  },
+  {
+    "question": "Why would a GIN index typically outperform a GiST index for JSONB containment queries, at the cost of what tradeoff?",
+    "a": "GIN is deprecated in modern PostgreSQL",
+    "b": "GiST cannot index JSONB at all",
+    "c": "GIN has no tradeoffs versus GiST",
+    "d": "GIN indexes tend to be faster for lookups and more compact for this use case, but are typically slower to build/update than GiST for highly dynamic data",
+    "correctAnswer": "d",
+    "explanation": "GIN generally provides faster lookups for containment-style queries (like JSONB @> or array operators) but has higher index maintenance cost on writes compared to GiST, which is part of why PostgreSQL offers both index types with different tradeoffs."
+  },
+  {
+    "question": "What does `CREATE INDEX CONCURRENTLY` avoid, and what's the tradeoff?",
+    "a": "It skips validating existing data entirely",
+    "b": "It avoids taking a long-held exclusive lock that blocks writes to the table during index creation, at the cost of taking roughly twice as long and requiring extra cleanup if it fails partway (leaving an invalid index)",
+    "c": "It avoids nothing different from a regular CREATE INDEX",
+    "d": "It builds the index in a separate database",
+    "correctAnswer": "b",
+    "explanation": "CONCURRENTLY builds the index using multiple passes so ordinary reads/writes can continue, but it can't run inside a transaction block, takes longer, and if it's interrupted it can leave an INVALID index behind that must be dropped and retried."
+  },
+  {
+    "question": "What does an index-only scan require to avoid visiting the heap (table) at all?",
+    "a": "The table must have no other indexes",
+    "b": "All columns needed by the query must be present in the index, and the corresponding heap pages must be marked all-visible in the visibility map",
+    "c": "The table must be a materialized view",
+    "d": "The query must use SELECT *",
+    "correctAnswer": "b",
+    "explanation": "Beyond simply covering the needed columns, PostgreSQL also needs the visibility map to confirm no other transactions could see a different (dirty) version of those rows — otherwise it must still check the heap for MVCC visibility, defeating the index-only optimization."
+  },
+  {
+    "question": "What is MVCC (Multi-Version Concurrency Control), which underlies PostgreSQL's transaction model?",
+    "a": "A model where each transaction sees a consistent snapshot of rows as of a point in time, achieved by keeping multiple physical row versions rather than locking readers against writers",
+    "b": "A caching layer for query plans",
+    "c": "A locking scheme where readers always block writers",
+    "d": "A replication protocol between PostgreSQL nodes",
+    "correctAnswer": "a",
+    "explanation": "MVCC lets readers and writers avoid blocking each other in most cases by keeping old row versions ('tuples') around so each transaction's snapshot sees a consistent, unmodified view, instead of relying purely on locks."
+  },
+  {
+    "question": "Why does UPDATE in PostgreSQL, under MVCC, not modify a row 'in place' the way one might assume?",
+    "a": "PostgreSQL writes a new row version (a new tuple) and marks the old one as expired rather than overwriting it, which is why VACUUM is needed to reclaim space from dead tuples",
+    "b": "UPDATE always creates a new table",
+    "c": "PostgreSQL only supports UPDATE via triggers",
+    "d": "It does modify in place; MVCC is unrelated",
+    "correctAnswer": "a",
+    "explanation": "Because of MVCC, an UPDATE inserts a brand-new tuple version and marks the old one dead rather than truly overwriting data, which is exactly why table/index bloat accumulates and periodic VACUUM is necessary to reclaim that space."
+  },
+  {
+    "question": "What is the purpose of VACUUM in PostgreSQL?",
+    "a": "Rebuilding all indexes from scratch",
+    "b": "Compressing table data using gzip",
+    "c": "Backing up the database",
+    "d": "Reclaiming storage occupied by dead tuples left behind by UPDATE/DELETE under MVCC, and updating statistics/visibility information",
+    "correctAnswer": "d",
+    "explanation": "VACUUM scans for dead row versions no longer visible to any transaction and marks that space reusable; VACUUM FULL additionally physically compacts the table (with a stronger lock), and autovacuum runs this automatically in the background."
+  },
+  {
+    "question": "What can happen if autovacuum falls badly behind on a heavily-updated table?",
+    "a": "Nothing; PostgreSQL is unaffected by dead tuples",
+    "b": "The table is automatically dropped",
+    "c": "PostgreSQL switches to a different storage engine",
+    "d": "Table and index bloat grows, query performance degrades, and in extreme cases transaction ID wraparound risk increases",
+    "correctAnswer": "d",
+    "explanation": "Excess dead tuples inflate table/index size and slow scans; more critically, unvacuumed tables risk transaction ID (XID) wraparound, a serious condition PostgreSQL guards against by eventually refusing new transactions until vacuumed."
+  },
+  {
+    "question": "What does the isolation anomaly 'write skew' refer to, which SERIALIZABLE prevents but REPEATABLE READ does not?",
+    "a": "A syntax error in a write query",
+    "b": "A transaction writing to a read-only replica",
+    "c": "Two transactions writing to the same row simultaneously and corrupting it",
+    "d": "Two concurrent transactions each read overlapping data, each make a decision based on what they read, and both commit — together violating an invariant that would have been caught if they'd run serially, even though neither directly conflicted on a single row",
+    "correctAnswer": "d",
+    "explanation": "Write skew is the classic example (e.g. two on-call doctors each individually confirming 'at least one other doctor is on call' before going off duty, both going off duty simultaneously) where row-level conflict detection misses a violated cross-row invariant; only true SERIALIZABLE isolation (via predicate locking) reliably prevents it."
+  },
+  {
+    "question": "What does `SELECT pg_advisory_lock(12345);` provide that row-level locks (like FOR UPDATE) do not?",
+    "a": "It automatically expires after 60 seconds",
+    "b": "An application-defined lock identified by an arbitrary key, unrelated to any specific table row, useful for coordinating logic that isn't naturally tied to a database row (e.g. a distributed cron job)",
+    "c": "It locks a specific row with id 12345",
+    "d": "It's identical to LOCK TABLE",
+    "correctAnswer": "b",
+    "explanation": "Advisory locks are application-level locks keyed by an arbitrary bigint (or two ints) that PostgreSQL tracks but doesn't tie to any table/row, useful for serializing arbitrary application logic across sessions without needing a real row to lock."
+  },
+  {
+    "question": "What is the difference between a session-level and a transaction-level advisory lock in PostgreSQL?",
+    "a": "A session-level lock (pg_advisory_lock) persists until explicitly unlocked or the session ends; a transaction-level lock (pg_advisory_xact_lock) is automatically released at the end of the current transaction",
+    "b": "Session-level locks only work with SERIALIZABLE isolation",
+    "c": "Transaction-level locks never release automatically",
+    "d": "There is no such distinction",
+    "correctAnswer": "a",
+    "explanation": "pg_advisory_xact_lock ties the lock's lifetime to the current transaction, releasing it automatically on COMMIT/ROLLBACK, while the plain pg_advisory_lock requires an explicit pg_advisory_unlock call or session termination."
+  },
+  {
+    "question": "What does `EXPLAIN (ANALYZE, BUFFERS)` add to the plan output that `EXPLAIN ANALYZE` alone does not show?",
+    "a": "Nothing additional",
+    "b": "The full SQL text of the query",
+    "c": "A visual diagram of the plan",
+    "d": "Information about shared/local buffer cache hits and misses for each plan node, helping diagnose I/O-bound operations",
+    "correctAnswer": "d",
+    "explanation": "The BUFFERS option reports how many buffer blocks were hit in cache versus read from disk per node, which is essential for distinguishing a slow query caused by CPU-bound work from one caused by actual disk I/O."
+  },
+  {
+    "question": "In an EXPLAIN plan, what does a large discrepancy between 'estimated rows' and 'actual rows' typically indicate?",
+    "a": "A hardware failure",
+    "b": "That the table has too many columns",
+    "c": "That the query is definitely wrong",
+    "d": "Stale or insufficient table statistics, which can cause the planner to choose a suboptimal plan (e.g. a nested loop instead of a hash join)",
+    "correctAnswer": "d",
+    "explanation": "The planner relies on statistics (gathered by ANALYZE/autovacuum) to estimate row counts; when those estimates are far off from reality, it often picks a plan that would be efficient for the estimated cardinality but is actually poor for the real one — a common trigger for running ANALYZE manually or increasing statistics targets."
+  },
+  {
+    "question": "What does increasing a column's statistics target via `ALTER TABLE t ALTER COLUMN c SET STATISTICS 500;` do?",
+    "a": "Tells ANALYZE to collect a more detailed (larger sample-based) histogram/most-common-values list for that column, improving planner estimates at the cost of slightly slower ANALYZE and larger pg_statistic entries",
+    "b": "Limits the column to 500 distinct values",
+    "c": "Sets a hard row limit for queries on that column",
+    "d": "Creates 500 partitions",
+    "correctAnswer": "a",
+    "explanation": "The per-column statistics target controls how much detail PostgreSQL's statistics collector gathers; raising it (default is 100) can improve estimate accuracy for skewed or high-cardinality columns where the planner is making poor choices."
+  },
+  {
+    "question": "What does the query planner's use of a Bitmap Heap Scan typically indicate?",
+    "a": "It only occurs on partitioned tables",
+    "b": "The planner is combining results from one or more index scans into a bitmap of matching heap pages, then visiting those pages — often chosen when moderately (not highly) selective, or combining multiple indexes with AND/OR",
+    "c": "The table has no indexes at all",
+    "d": "The table is being scanned in a random, unbitmap order",
+    "correctAnswer": "b",
+    "explanation": "Bitmap Heap Scan sits between a pure Index Scan and a Seq Scan: it builds an in-memory bitmap of matching pages/rows from index scan(s) first, then reads only those heap pages, which is efficient when selectivity is too broad for row-by-row index scans but still much better than a full scan."
+  },
+  {
+    "question": "What does a Nested Loop join generally cost when the outer relation has N rows and probing the inner relation per row costs roughly constant time (e.g. via an index)?",
+    "a": "Roughly O(N) total, since each of the N outer rows does a cheap indexed probe into the inner table",
+    "b": "O(N + M)",
+    "c": "It's always the slowest possible join strategy",
+    "d": "O(N^2) always, regardless of indexes",
+    "correctAnswer": "a",
+    "explanation": "Nested Loop is efficient exactly when the inner side can be probed cheaply (typically via an index) for each outer row; without such an index, it degrades toward a full scan of the inner table per outer row, which is where it earns its reputation for being slow on large unindexed joins."
+  },
+  {
+    "question": "Why might a Hash Join be preferred by the planner over a Nested Loop for two large tables joined on a non-indexed column?",
+    "a": "Hash Join builds an in-memory hash table from the smaller relation once, then probes it once per row of the larger relation — avoiding a per-row scan of the smaller table for every outer row like an unindexed Nested Loop would require",
+    "b": "Hash Join is always chosen regardless of table size",
+    "c": "Hash Join never spills to disk",
+    "d": "Hash Join guarantees sorted output",
+    "correctAnswer": "a",
+    "explanation": "Hash Join's single build phase amortizes the cost of accessing the smaller ('build') side, making it efficient for large equi-joins without a usable index, whereas Nested Loop without an index would re-scan the inner table for every single outer row."
+  },
+  {
+    "question": "What does the `work_mem` setting influence during query execution?",
+    "a": "The amount of memory a single sort or hash operation is allowed to use before spilling to temporary disk files",
+    "b": "The maximum size of the entire database",
+    "c": "The size of the WAL (write-ahead log)",
+    "d": "The number of concurrent connections allowed",
+    "correctAnswer": "a",
+    "explanation": "work_mem caps memory per sort/hash/other operation (and each query can use multiple such allocations); too low a value causes expensive disk-based sort/hash spills, visible in EXPLAIN ANALYZE as 'external merge Disk' or similar."
+  },
+  {
+    "question": "What does 'External merge Disk' appearing in an EXPLAIN ANALYZE sort node indicate?",
+    "a": "The sort ran entirely in memory efficiently",
+    "b": "The sort exceeded work_mem and had to spill intermediate results to temporary disk files, which is typically much slower than an in-memory sort",
+    "c": "The query used a materialized view",
+    "d": "The disk itself has failed",
+    "correctAnswer": "b",
+    "explanation": "This message is a direct signal that the configured work_mem was insufficient for the sort's data volume, causing PostgreSQL to fall back to slower disk-based merge sorting — a common target for either raising work_mem or reducing the sorted data volume."
+  },
+  {
+    "question": "What is table partitioning in PostgreSQL primarily used for?",
+    "a": "Automatically sharding data across multiple servers",
+    "b": "Creating multiple identical replicas for load balancing",
+    "c": "Splitting a large logical table into smaller physical pieces (partitions) by a partition key, so queries and maintenance can target relevant partitions instead of the whole table",
+    "d": "Encrypting sensitive columns",
+    "correctAnswer": "c",
+    "explanation": "Declarative partitioning (by RANGE, LIST, or HASH) lets PostgreSQL prune irrelevant partitions from a query plan and makes bulk operations like dropping old data (via DROP PARTITION) far cheaper than a mass DELETE."
+  },
+  {
+    "question": "What does 'partition pruning' mean in the context of a partitioned table?",
+    "a": "The planner recognizing, from WHERE conditions on the partition key, that only a subset of partitions can possibly contain matching rows, and skipping the rest entirely",
+    "b": "Removing duplicate rows across partitions",
+    "c": "Automatically deleting old partitions",
+    "d": "Compressing partition data",
+    "correctAnswer": "a",
+    "explanation": "If a query filters on the partition key (e.g. `WHERE created_at >= '2026-01-01'` on a table partitioned by month), the planner can prove certain partitions can't contain matches and exclude them from the scan entirely, often at planning time."
+  },
+  {
+    "question": "Why must a UNIQUE or PRIMARY KEY constraint on a partitioned table (pre-PostgreSQL 12/17 nuances aside) generally include the partition key?",
+    "a": "The partition key must always be the sole primary key column",
+    "b": "It's an arbitrary restriction with no underlying reason",
+    "c": "PostgreSQL enforces uniqueness per-partition via each partition's own index, so without the partition key in the constraint, duplicate values could exist across different partitions undetected",
+    "d": "Partitioned tables cannot have any constraints",
+    "correctAnswer": "c",
+    "explanation": "Because each partition maintains its own local index, a global uniqueness guarantee (spanning partitions) can't be enforced unless the constrained columns include the partition key, ensuring any duplicate would necessarily fall in the same partition where the local index would catch it."
+  },
+  {
+    "question": "What does a trigger's `BEFORE` timing allow that an `AFTER` trigger does not?",
+    "a": "A BEFORE trigger can modify (or cancel, by returning NULL) the row before it's actually written; an AFTER trigger runs once the change has already been applied and cannot alter that same row's stored values",
+    "b": "Nothing different, they behave identically",
+    "c": "BEFORE triggers cannot access NEW or OLD",
+    "d": "AFTER triggers run before constraints are checked",
+    "correctAnswer": "a",
+    "explanation": "BEFORE row-level triggers can inspect and modify the NEW record (or return NULL to suppress the operation) prior to it being written, which is why they're used for tasks like auto-populating an updated_at column; AFTER triggers see the already-committed-to-the-statement change and are typically used for side effects like logging or cascading updates."
+  },
+  {
+    "question": "What is the difference between a ROW-level and a STATEMENT-level trigger?",
+    "a": "No difference; PostgreSQL only supports one kind",
+    "b": "ROW-level triggers cannot be used with UPDATE",
+    "c": "A ROW-level trigger fires once per affected row (with access to NEW/OLD); a STATEMENT-level trigger fires once per triggering SQL statement regardless of how many rows it affected, with no row-specific data",
+    "d": "STATEMENT-level triggers always run before ROW-level ones regardless of declared order",
+    "correctAnswer": "c",
+    "explanation": "FOR EACH ROW triggers execute per affected row, useful for per-row logic like auditing; FOR EACH STATEMENT triggers execute exactly once per statement (even for a bulk UPDATE touching thousands of rows), useful for statement-level bookkeeping."
+  },
+  {
+    "question": "What is the purpose of a deferred constraint (e.g. `DEFERRABLE INITIALLY DEFERRED`)?",
+    "a": "It converts a CHECK constraint into a trigger",
+    "b": "It disables the constraint permanently",
+    "c": "It makes the constraint only apply to SELECT statements",
+    "d": "It delays constraint checking until the end of the transaction (COMMIT) instead of immediately after each statement, allowing temporarily 'invalid' intermediate states within a transaction, e.g. swapping two rows' unique keys",
+    "correctAnswer": "d",
+    "explanation": "Deferred constraints are essential for patterns like swapping unique values between two rows in one transaction — checked immediately, the constraint would fail mid-transaction even though the final state is valid; deferring the check to COMMIT allows the transient violation."
+  },
+  {
+    "question": "What does EXCLUDE USING gist (room_id WITH =, during WITH &&) accomplish on a bookings table?",
+    "a": "Prevents overlapping time ranges (via the && range-overlap operator) for the same room, enforcing 'no double-booking' as a genuine database constraint rather than application logic",
+    "b": "Is only valid syntax for full-text search columns",
+    "c": "Prevents any two bookings from ever having the same room_id",
+    "d": "Automatically merges overlapping bookings into one row",
+    "correctAnswer": "a",
+    "explanation": "EXCLUSION constraints generalize UNIQUE to arbitrary operators: this example says 'for rows with equal room_id, their during ranges must never overlap (&&)', which is the standard PostgreSQL-native way to prevent double-booking without relying purely on application-level checks."
+  },
+  {
+    "question": "What does the range type `tstzrange` combined with the `&&` operator let you express?",
+    "a": "The difference in seconds between two timestamps",
+    "b": "Converting a timestamp to a different time zone",
+    "c": "Whether two timestamp-with-timezone ranges overlap, useful for scheduling/booking overlap checks",
+    "d": "String pattern matching between two timestamps",
+    "correctAnswer": "c",
+    "explanation": "Range types like tstzrange model a continuous interval, and && tests for any overlap between two such ranges — a much more direct and indexable expression than manually comparing start/end columns with multiple AND/OR conditions."
+  },
+  {
+    "question": "What does `SELECT * FROM orders WHERE tsrange(start_date, end_date) @> '2026-06-15'::date;` check?",
+    "a": "Whether the range is empty",
+    "b": "Whether end_date is after the given date only",
+    "c": "Whether the given date falls within the order's date range",
+    "d": "Whether start_date equals the given date",
+    "correctAnswer": "c",
+    "explanation": "The @> (contains) operator on a range type tests whether the given point value falls inside the range, a common and index-friendly alternative to `WHERE start_date <= x AND end_date >= x`."
+  },
+  {
+    "question": "What does full-text search's `to_tsvector('english', body) @@ to_tsquery('english', 'cat & dog')` match?",
+    "a": "Rows where body contains the literal substring 'cat & dog'",
+    "b": "Rows matching a regular expression",
+    "c": "Rows where body is exactly 'cat' or exactly 'dog'",
+    "d": "Rows whose text, after English-specific normalization (stemming, stop-word removal), contains both the lexemes 'cat' and 'dog' (in any position/order)",
+    "correctAnswer": "d",
+    "explanation": "to_tsvector converts text into normalized lexemes (e.g. stemming 'dogs' to 'dog', dropping stop words) and to_tsquery parses a boolean search expression; @@ tests whether the query's conditions are satisfied by the document's lexemes, unrelated to literal substring matching."
+  },
+  {
+    "question": "Why is a GIN index typically created on the result of to_tsvector() rather than on the raw text column for full-text search?",
+    "a": "tsvector columns are required by law to be indexed",
+    "b": "It's purely a naming convention with no performance effect",
+    "c": "GIN cannot index text columns directly at all",
+    "d": "Indexing the tsvector expression lets PostgreSQL use the index to accelerate @@ queries directly against the precomputed lexeme set, rather than recomputing to_tsvector for every row at query time",
+    "correctAnswer": "d",
+    "explanation": "A functional GIN index on to_tsvector('english', body) captures the normalized lexemes so the search operator can consult the index directly; without it, every query would have to re-run to_tsvector on every row (or you'd maintain a separate stored tsvector column with a trigger)."
+  },
+  {
+    "question": "What does `SELECT * FROM json_populate_record(NULL::my_type, '{\"a\":1,\"b\":2}'::json);` do?",
+    "a": "Deletes a record matching the JSON",
+    "b": "Converts a JSON object into a row of the given composite type, mapping matching keys to columns",
+    "c": "Inserts a new row into my_type's table",
+    "d": "Validates the JSON against a schema",
+    "correctAnswer": "b",
+    "explanation": "json_populate_record (and jsonb_populate_record) map a JSON object's keys onto a composite type's fields, letting you construct a typed row from unstructured JSON without manually extracting each field."
+  },
+  {
+    "question": "What is a key difference between the jsonb_set() function and simply reassigning a JSONB column?",
+    "a": "There is no difference",
+    "b": "jsonb_set() deletes all other keys",
+    "c": "jsonb_set() returns a new JSONB value with a specific path updated, leaving the rest of the structure untouched — needed because JSONB values are immutable and can't be mutated in place like a mutable object",
+    "d": "jsonb_set() only works on top-level keys",
+    "correctAnswer": "c",
+    "explanation": "JSONB values are immutable in PostgreSQL; jsonb_set(target, path, new_value) computes and returns an entirely new JSONB value with just the specified path replaced, which you then assign back to the column via UPDATE."
+  },
+  {
+    "question": "What does the `#>>` operator do on a JSONB value, e.g. `data #>> '{address,city}'`?",
+    "a": "Deletes the address.city key",
+    "b": "Merges two JSON paths",
+    "c": "Checks whether the path exists, returning a boolean",
+    "d": "Extracts the value at the given path (an array of keys) and returns it as text",
+    "correctAnswer": "d",
+    "explanation": "#>> extracts a nested value using a path array and casts the result to text (#> returns it as JSON/JSONB instead), useful for reaching deeply nested fields without chaining multiple -> operators."
+  },
+  {
+    "question": "Why can naive pagination with `OFFSET n LIMIT m` become a performance problem for large n?",
+    "a": "PostgreSQL must still scan and discard the first n rows before returning the next m, so cost grows roughly linearly with the offset even though only m rows are returned",
+    "b": "It causes a full table lock",
+    "c": "OFFSET has a hard maximum of 1000 in PostgreSQL",
+    "d": "LIMIT and OFFSET cannot be combined",
+    "correctAnswer": "a",
+    "explanation": "OFFSET doesn't let the planner skip rows for free — it still has to produce and discard them in order, so deep pagination (e.g. OFFSET 1000000) gets progressively slower; keyset/cursor-based pagination (WHERE id > last_seen_id ORDER BY id LIMIT m) avoids this by seeking directly via an index."
+  },
+  {
+    "question": "What is 'keyset pagination' (a.k.a. seek method), and why is it often preferred over OFFSET for large datasets?",
+    "a": "It only works for numeric primary keys, never composite keys",
+    "b": "It's identical to OFFSET pagination",
+    "c": "It requires disabling indexes",
+    "d": "It uses a WHERE condition on the last-seen row's sort key (e.g. WHERE id > :last_id ORDER BY id LIMIT n) so the database can seek directly via an index instead of scanning and discarding preceding rows",
+    "correctAnswer": "d",
+    "explanation": "By filtering on the last page's boundary value rather than counting rows to skip, keyset pagination lets an index scan jump straight to the right starting point, giving consistent performance regardless of how deep into the result set you are — and it also composes with multi-column sort keys via row-wise comparisons."
+  },
+  {
+    "question": "What is a subtle correctness pitfall of `SELECT * FROM t ORDER BY created_at LIMIT 10 OFFSET 10` used for page 2, if new rows can be inserted between requests?",
+    "a": "There is no pitfall, it's always accurate",
+    "b": "Rows can shift between pages (duplicates or skipped rows appear) since the underlying ordering-relevant data changed between the two page requests",
+    "c": "It only affects DELETE operations, not SELECT",
+    "d": "OFFSET automatically adjusts for new inserts",
+    "correctAnswer": "b",
+    "explanation": "Because OFFSET pagination re-derives 'page 2' fresh each time based on current data, any inserts/deletes affecting the ordered position of rows between requests can cause a row to be shown twice or skipped entirely — a problem keyset pagination avoids since it anchors on a specific already-seen value."
+  },
+  {
+    "question": "What is the effect of PostgreSQL's implicit type coercion when comparing `WHERE numeric_column = '5'` (a numeric column compared to a text literal)?",
+    "a": "It compares them as strings",
+    "b": "PostgreSQL implicitly casts the string literal to match the column's numeric type for the comparison, generally without breaking index usage since the cast is on the constant, not the column",
+    "c": "It silently returns zero rows",
+    "d": "It always raises a type mismatch error",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL is often able to resolve an untyped string literal against the column's actual type at parse time, casting the literal (a cheap, one-time operation) rather than wrapping the indexed column in a function — the dangerous case is the reverse, e.g. wrapping the column itself in a cast/function, which can defeat an index."
+  },
+  {
+    "question": "Why can `WHERE some_int_column::text = '5'` be worse for performance than `WHERE some_int_column = 5`?",
+    "a": "PostgreSQL disallows casting columns entirely",
+    "b": "It changes the column's actual stored type permanently",
+    "c": "Casting the indexed column itself (rather than the literal) generally prevents a plain B-tree index on that column from being used directly, since the planner would need an index on the cast expression instead",
+    "d": "There's no performance difference ever",
+    "correctAnswer": "c",
+    "explanation": "Wrapping the indexed column in a function or cast changes what's actually being compared, so an ordinary index on the raw column generally can't be used (an expression index on some_int_column::text would be needed instead) — a frequent, easy-to-miss cause of unexpected sequential scans in PR review."
+  },
+  {
+    "question": "What does `NOT IN (SELECT ... )` do unexpectedly if the subquery can return a NULL value among its rows?",
+    "a": "NULLs in the subquery are simply ignored",
+    "b": "It behaves identically to NOT EXISTS in every case",
+    "c": "It throws a syntax error",
+    "d": "If the subquery returns even one NULL, the entire NOT IN comparison evaluates to NULL/unknown for every row, making the outer query return zero rows unexpectedly",
+    "correctAnswer": "d",
+    "explanation": "This is one of the most notorious SQL gotchas: `x NOT IN (a, b, NULL)` is equivalent to `x <> a AND x <> b AND x <> NULL`, and since `x <> NULL` is always NULL, the whole AND chain collapses to NULL/unknown, silently excluding every row — using NOT EXISTS (which handles NULLs correctly) avoids this trap entirely."
+  },
+  {
+    "question": "Why is `NOT EXISTS (subquery)` generally safer than `NOT IN (subquery)` for correctness?",
+    "a": "They have identical semantics in all cases",
+    "b": "NOT EXISTS only checks row existence via a correlated boolean test, so a NULL value in the subquery's other columns doesn't corrupt the boolean logic the way NOT IN's per-value comparison does",
+    "c": "NOT IN is faster in every case",
+    "d": "NOT EXISTS cannot be used with correlated subqueries",
+    "correctAnswer": "b",
+    "explanation": "NOT EXISTS evaluates presence/absence of matching rows without doing per-value equality comparisons against potentially-NULL subquery results, so it doesn't suffer from the NOT IN + NULL trap described above — a key thing to flag in PR review when you see NOT IN against a subquery that could plausibly contain NULLs."
+  },
+  {
+    "question": "What subtlety applies to `COUNT(DISTINCT column)` when column contains NULL values?",
+    "a": "It raises an error",
+    "b": "All NULLs are treated as a single counted value",
+    "c": "NULL values are excluded from the distinct count, just as COUNT(column) ignores NULLs",
+    "d": "Each NULL counts as a separate distinct value",
+    "correctAnswer": "c",
+    "explanation": "Like other COUNT(column) forms, COUNT(DISTINCT column) simply ignores rows where the column is NULL, counting only the distinct non-NULL values present."
+  },
+  {
+    "question": "What is a 'phantom read', and which isolation level is the minimum that prevents it under the SQL standard's definitions (noting PostgreSQL's REPEATABLE READ is actually stricter than the standard requires)?",
+    "a": "A row that appears then disappears within the same statement",
+    "b": "Reading a row that was already deleted before the transaction began",
+    "c": "A transaction re-runs a range query and sees new rows that another transaction inserted and committed in between; SERIALIZABLE prevents it, and PostgreSQL's REPEATABLE READ also prevents it in practice (stricter than the SQL standard's minimum requirement)",
+    "d": "A crash-related data loss event; no isolation level prevents it",
+    "correctAnswer": "c",
+    "explanation": "A phantom read is when a repeated range-based query (e.g. `WHERE status = 'pending'`) returns additional rows on a later execution within the same transaction because of concurrent commits; PostgreSQL's snapshot-based REPEATABLE READ actually prevents this in practice, going beyond what the ANSI SQL standard's REPEATABLE READ strictly requires."
+  },
+  {
+    "question": "What does the term 'serialization failure' (SQLSTATE 40001) typically signal in PostgreSQL under REPEATABLE READ or SERIALIZABLE isolation?",
+    "a": "A permanent data corruption issue",
+    "b": "A network timeout",
+    "c": "An unrecoverable disk failure",
+    "d": "The transaction was aborted because completing it could not be reconciled with a valid serial ordering of concurrent transactions — the application is expected to retry the transaction",
+    "correctAnswer": "d",
+    "explanation": "Under stricter isolation levels, PostgreSQL may detect that allowing a transaction to commit would violate serializability guarantees and abort it with a 40001 error; well-behaved applications using these isolation levels are expected to catch this and retry the whole transaction."
+  },
+  {
+    "question": "Why is 'SELECT COUNT(*) FROM huge_table;' potentially much slower in PostgreSQL than in some other databases?",
+    "a": "PostgreSQL cannot compute COUNT(*) at all",
+    "b": "COUNT(*) requires acquiring a table-level exclusive lock",
+    "c": "It's actually always fast regardless of table size",
+    "d": "Because of MVCC, PostgreSQL has no single always-accurate row-count metadata; it typically must scan visible tuples to get an exact count rather than reading a pre-maintained counter",
+    "correctAnswer": "d",
+    "explanation": "Unlike some engines that maintain a live exact row count, PostgreSQL's MVCC model means visibility can differ per transaction, so an exact COUNT(*) generally requires visiting rows to check visibility — for a rough estimate instead, people often query planner statistics (e.g. reltuples in pg_class) rather than running an exact count."
+  },
+  {
+    "question": "What does `pg_class.reltuples` provide, and why might it differ from the true row count?",
+    "a": "It is unrelated to row counts and stores column widths",
+    "b": "It only counts rows inserted today",
+    "c": "It's an estimated row count last recorded by ANALYZE/VACUUM, useful for a fast approximate count but potentially stale if the table has changed significantly since the last statistics run",
+    "d": "It is always exactly accurate in real time",
+    "correctAnswer": "c",
+    "explanation": "reltuples is a planner statistic updated by ANALYZE (and VACUUM), giving a cheap approximate row count without scanning the table — a common trick for dashboards that don't need an exact figure, but it can drift from reality between statistics refreshes."
+  },
+  {
+    "question": "What's the danger of an application performing 'SELECT balance FROM accounts WHERE id = 1' followed by a separate application-level check-then-update, without any locking, in a concurrent environment?",
+    "a": "A classic race condition (lost update / TOCTOU) can occur: two concurrent transactions can both read the same balance, both compute an updated value based on stale data, and the second UPDATE silently overwrites the first's change",
+    "b": "PostgreSQL disallows SELECT followed by UPDATE in different statements",
+    "c": "It only matters for DELETE, not UPDATE",
+    "d": "There is no danger; PostgreSQL prevents all such races automatically",
+    "correctAnswer": "a",
+    "explanation": "Without SELECT ... FOR UPDATE (or an atomic single-statement UPDATE like `SET balance = balance - :amount`), two concurrent read-then-write sequences based on the same stale read can race, with the last UPDATE simply overwriting the other's intended change — a classic 'lost update' bug worth flagging in PR review."
+  },
+  {
+    "question": "How does `UPDATE accounts SET balance = balance - 100 WHERE id = 1;` avoid the read-then-write race described in a lost-update scenario?",
+    "a": "It only works if balance is a computed column",
+    "b": "It requires an explicit BEGIN/COMMIT to be safe",
+    "c": "The entire read-modify-write happens atomically within a single statement/row lock, so PostgreSQL serializes concurrent UPDATEs to the same row rather than allowing them to interleave on stale application-side reads",
+    "d": "It doesn't avoid it; the same race applies",
+    "correctAnswer": "c",
+    "explanation": "Doing the arithmetic inside the UPDATE statement itself means PostgreSQL evaluates `balance - 100` against the current row value under a row lock as one atomic operation; a second concurrent UPDATE on the same row will simply wait for the first to finish and then apply against the now-updated value, rather than silently overwriting it based on a stale read."
+  },
+  {
+    "question": "What does the term 'N+1 query problem' mean, and how does it typically arise from application code layered on top of SQL?",
+    "a": "An indexing strategy for range queries",
+    "b": "Fetching a list of N parent rows, then issuing one additional query per parent to fetch related child rows, resulting in N+1 total round trips instead of a single JOIN or batched query",
+    "c": "A SQL syntax error involving N+1 placeholders",
+    "d": "A specific PostgreSQL configuration limit",
+    "correctAnswer": "b",
+    "explanation": "The N+1 pattern is an application/ORM-level anti-pattern (not a SQL keyword) where naive per-row lazy loading issues a separate query for each of N results, which a code reviewer should typically flag in favor of a single JOIN, IN (...) batch fetch, or eager-loading strategy."
+  },
+  {
+    "question": "Why might a code reviewer flag `SELECT * FROM large_table;` in application code even if it currently 'works'?",
+    "a": "SELECT * is always a syntax error",
+    "b": "It always causes a full table lock",
+    "c": "PostgreSQL forbids SELECT * outside of debugging",
+    "d": "It couples the query to the table's current full column set (breaking if columns are added/reordered/renamed), can transfer unnecessary data over the network, and can silently defeat an index-only scan that a narrower column list would have allowed",
+    "correctAnswer": "d",
+    "explanation": "SELECT * is a common PR-review flag: besides pulling more data than needed, it creates fragile coupling to the table's exact shape and can prevent optimizations like index-only scans that only apply when the exact needed columns are known and covered by an index."
+  },
+  {
+    "question": "Why is a missing WHERE clause on an UPDATE or DELETE statement one of the most important things to catch in SQL code review?",
+    "a": "It's stylistically discouraged but functionally harmless",
+    "b": "PostgreSQL requires a WHERE clause and will reject the statement",
+    "c": "It only matters for tables larger than 1 million rows",
+    "d": "Without WHERE, the statement applies to every single row in the table, which for production data is often catastrophic and, if already committed, may be unrecoverable without a backup",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL does not require a WHERE clause on UPDATE/DELETE — omitting it (often by accident, e.g. from a bad find-and-replace) affects the entire table, and if the transaction is committed before anyone notices, restoring the prior state may require a full backup/PITR recovery rather than a simple ROLLBACK."
+  },
+  {
+    "question": "Why does adding a foreign key constraint referencing a large existing table sometimes require special care in production?",
+    "a": "Foreign keys are purely advisory in PostgreSQL and are never actually checked",
+    "b": "Foreign keys cannot reference tables with more than 1000 rows",
+    "c": "Validating the constraint against all existing rows can take a significant lock/time on a large table, which is why patterns like ADD CONSTRAINT ... NOT VALID followed by a separate VALIDATE CONSTRAINT are used to reduce the disruptive window",
+    "d": "It always requires taking the database offline",
+    "correctAnswer": "c",
+    "explanation": "As covered by the NOT VALID / VALIDATE CONSTRAINT pattern, adding a foreign key that must scan a large existing table to verify compliance can hold a lock for a long time if done in one step; splitting the operation avoids a long blocking validation during the initial ADD."
+  },
+  {
+    "question": "What does `SET LOCAL statement_timeout = '5s';` inside a transaction do?",
+    "a": "Schedules the transaction to auto-commit after 5 seconds",
+    "b": "Sets the maximum lifetime of the whole session to 5 seconds",
+    "c": "Aborts any statement within that transaction that runs longer than 5 seconds, as a safety net against runaway queries",
+    "d": "Delays the transaction's start by 5 seconds",
+    "correctAnswer": "c",
+    "explanation": "statement_timeout causes PostgreSQL to cancel any single statement exceeding the given duration; SET LOCAL scopes the change to just the current transaction, a common defensive pattern for scripts/migrations that must not be allowed to hang indefinitely."
+  },
+  {
+    "question": "What is a common gotcha with `LIKE '%term%'` performance on large text columns, even with a standard B-tree index present?",
+    "a": "A leading wildcard (%term) prevents a standard B-tree index from being used for prefix matching, since B-tree relies on sorted-order prefix scanning; a leading-wildcard pattern typically needs a trigram (pg_trgm) GIN/GiST index instead",
+    "b": "LIKE requires the column to be JSONB",
+    "c": "LIKE cannot use any index type regardless of pattern",
+    "d": "LIKE always performs a full table scan even with a trailing-only wildcard",
+    "correctAnswer": "a",
+    "explanation": "A standard B-tree index can accelerate `column LIKE 'term%'` (prefix match) because that respects sorted order, but a pattern with a leading % can't be served by the sorted structure; the pg_trgm extension's trigram indexes are the standard PostgreSQL solution for efficient substring/leading-wildcard search."
+  },
+  {
+    "question": "What does the pg_trgm extension's similarity()/% operator enable?",
+    "a": "Full JSON schema validation",
+    "b": "Fuzzy string matching based on shared three-character sequences (trigrams), useful for typo-tolerant search and can be backed by a GIN/GiST index for performance",
+    "c": "Exact string equality checks only",
+    "d": "Automatic spelling correction of SQL keywords",
+    "correctAnswer": "b",
+    "explanation": "pg_trgm decomposes strings into overlapping 3-character trigrams and measures similarity by shared trigram counts, powering both fuzzy 'did you mean' style matching and, combined with a trigram index, efficient substring/LIKE '%...%' queries."
+  },
+  {
+    "question": "Why might two sessions each holding a lock on a different row, then each trying to lock the other's row (e.g. two concurrent UPDATEs touching rows in opposite order), lead to a deadlock rather than a simple wait?",
+    "a": "Deadlocks only occur with more than 2 sessions",
+    "b": "Each transaction is waiting for a lock the other transaction holds, forming a circular dependency with no way for either to proceed independently",
+    "c": "This describes normal, non-deadlocking blocking behavior",
+    "d": "PostgreSQL always processes locks in a global queue, so this cannot happen",
+    "correctAnswer": "b",
+    "explanation": "This is the textbook deadlock scenario: Transaction A locks row 1 and wants row 2 (held by B), while B locks row 2 and wants row 1 (held by A) — neither can proceed, so PostgreSQL's deadlock detector eventually aborts one of them; consistent lock ordering across the application is the usual prevention strategy."
+  },
+  {
+    "question": "What does `SELECT * FROM pg_locks WHERE NOT granted;` help diagnose?",
+    "a": "Historical query performance over the last week",
+    "b": "Disk space usage per table",
+    "c": "Tables missing an index",
+    "d": "Currently blocked lock requests, useful for investigating sessions stuck waiting on other transactions",
+    "correctAnswer": "d",
+    "explanation": "pg_locks lists all lock requests in the system; rows where granted is false represent sessions actively blocked waiting for a lock held elsewhere, a key diagnostic view for investigating contention or apparent 'hangs'."
+  },
+  {
+    "question": "What changed in PostgreSQL 12 regarding CTE optimization compared to earlier versions?",
+    "a": "Before PG12, a CTE was always an 'optimization fence' (materialized and opaque to the outer query's planner); from PG12 onward, non-recursive CTEs are inlined by default like subqueries unless MATERIALIZED is explicitly specified",
+    "b": "Recursive CTEs were disabled by default",
+    "c": "CTEs were removed entirely",
+    "d": "CTEs became mandatory for all subqueries",
+    "correctAnswer": "a",
+    "explanation": "This is a significant, often-missed behavior change: pre-12 code relying on a CTE being materialized (e.g. to force evaluation order or avoid re-executing a volatile function per outer row) can behave differently on PG12+ unless AS MATERIALIZED is added explicitly."
+  },
+  {
+    "question": "Why would you explicitly write `WITH x AS MATERIALIZED (...)` on PostgreSQL 12+?",
+    "a": "To force PostgreSQL to fully evaluate and cache the CTE's result once, rather than potentially inlining/re-evaluating it as part of the outer query's plan — useful when the CTE calls a volatile function or you want to guarantee it runs once",
+    "b": "MATERIALIZED is required syntax for every CTE",
+    "c": "To convert the CTE into a permanent materialized view",
+    "d": "It has no effect on PostgreSQL 12+",
+    "correctAnswer": "a",
+    "explanation": "AS MATERIALIZED opts back into the pre-12 'optimization fence' behavior for cases where that's actually desired, such as ensuring a side-effecting or expensive computation isn't duplicated by inlining."
+  },
+  {
+    "question": "What does `SELECT ... FOR NO KEY UPDATE` provide compared to plain `FOR UPDATE`?",
+    "a": "A weaker lock that still blocks concurrent updates/deletes of the row but permits certain concurrent foreign-key-checking operations that FOR UPDATE would otherwise block, reducing unnecessary contention",
+    "b": "It skips locking entirely",
+    "c": "It is identical to FOR UPDATE in every way",
+    "d": "It only works on partitioned tables",
+    "correctAnswer": "a",
+    "explanation": "FOR NO KEY UPDATE is a finer-grained row lock mode (introduced for better FK-related concurrency) used internally by plain UPDATE statements that don't touch key columns, allowing more concurrency with FK-referencing transactions than the stronger FOR UPDATE lock."
+  },
+  {
+    "question": "What is the purpose of the MERGE statement introduced in PostgreSQL 15?",
+    "a": "It merges two databases into one",
+    "b": "It's only usable for merging JSON documents",
+    "c": "It replaces JOIN entirely",
+    "d": "It lets you conditionally INSERT, UPDATE, or DELETE rows in a target table based on matching against a source, in a single statement — a more flexible generalization of the INSERT ... ON CONFLICT upsert pattern",
+    "correctAnswer": "d",
+    "explanation": "MERGE INTO target USING source ON condition WHEN MATCHED/NOT MATCHED THEN ... provides SQL-standard conditional multi-action logic (insert/update/delete) in one statement, going beyond what ON CONFLICT alone can express (e.g. also deleting unmatched target rows)."
+  },
+  {
+    "question": "What does `NULLS NOT DISTINCT`, added to unique constraints/indexes in PostgreSQL 15, change?",
+    "a": "It only applies to primary keys, never plain UNIQUE constraints",
+    "b": "By default, PostgreSQL treats multiple NULLs in a unique column as distinct (not conflicting); NULLS NOT DISTINCT makes the constraint instead treat NULLs as equal to each other, so only one NULL row is allowed",
+    "c": "Nothing; it's the pre-existing default behavior",
+    "d": "It forbids NULL values from ever being stored",
+    "correctAnswer": "b",
+    "explanation": "Standard SQL unique constraints treat NULL as not equal to anything (including another NULL), so multiple NULL rows are historically allowed; NULLS NOT DISTINCT (PG15+) flips that so a UNIQUE constraint also rejects a second NULL, useful for e.g. an optional-but-unique-when-present column."
+  },
+  {
+    "question": "Can a CHECK constraint reference another table, e.g. `CHECK (customer_id IN (SELECT id FROM customers))`?",
+    "a": "Only for materialized views",
+    "b": "Yes, and it's the recommended way to enforce referential integrity",
+    "c": "Only if the constraint is marked DEFERRABLE",
+    "d": "No — PostgreSQL requires CHECK constraint expressions to be immutable and self-contained to the row being checked; cross-table logic requires a FOREIGN KEY or a trigger instead",
+    "correctAnswer": "d",
+    "explanation": "PostgreSQL rejects CHECK constraints containing subqueries (they aren't guaranteed row-local/immutable); referential integrity across tables is the job of FOREIGN KEY constraints, and more complex cross-row/cross-table business rules need triggers instead."
+  },
+  {
+    "question": "What does `GENERATED ALWAYS AS (price * quantity) STORED` define on a column?",
+    "a": "A computed column whose value is automatically derived from other columns in the same row and physically stored, recalculated whenever the underlying columns change; it cannot be directly written to",
+    "b": "A default value used only when the column is omitted from INSERT",
+    "c": "An index on price and quantity",
+    "d": "A trigger that fires on every SELECT",
+    "correctAnswer": "a",
+    "explanation": "Generated columns (PostgreSQL only supports the STORED variant, not VIRTUAL) are computed from other columns in the same row and physically persisted; attempting to INSERT/UPDATE a value into a generated column directly is an error."
+  },
+  {
+    "question": "What is TOAST in PostgreSQL, and why does it matter for very large text/JSONB column values?",
+    "a": "The Oversized-Attribute Storage Technique: PostgreSQL automatically compresses and/or moves large field values into a separate TOAST table, so the main table's rows stay a manageable size, which affects how those large values are read back and compressed",
+    "b": "A caching layer unrelated to storage",
+    "c": "A deprecated feature removed in modern PostgreSQL",
+    "d": "A tool exclusively for backups",
+    "correctAnswer": "a",
+    "explanation": "TOAST kicks in automatically for values exceeding a threshold (around 2KB by default), transparently storing them out-of-line (and often compressed) so that wide rows with large text/JSONB/bytea fields don't blow past the page size limit — usually invisible to queries but relevant for performance tuning of large-value columns."
+  },
+  {
+    "question": "What does `string_agg(name, ', ' ORDER BY name)` do differently from `string_agg(name, ', ')` without ORDER BY?",
+    "a": "It reverses the aggregation direction",
+    "b": "It guarantees the concatenated names appear in a specific (here alphabetical) order, since without an explicit ORDER BY inside the aggregate call, the order of aggregated rows is otherwise unspecified",
+    "c": "It deduplicates the names",
+    "d": "Nothing; ORDER BY inside an aggregate call is invalid syntax",
+    "correctAnswer": "b",
+    "explanation": "Aggregate functions support an ORDER BY clause within their own parentheses (distinct from the query's ORDER BY) to control the order in which values are combined — essential for order-sensitive aggregates like string_agg/array_agg, since GROUP BY alone gives no ordering guarantee for the underlying rows."
+  },
+  {
+    "question": "Can DISTINCT be combined with an aggregate function, e.g. `string_agg(DISTINCT category, ', ')`?",
+    "a": "It only works with COUNT",
+    "b": "No, DISTINCT can only be used in a plain SELECT list",
+    "c": "It silently ignores the DISTINCT keyword",
+    "d": "Yes — DISTINCT inside an aggregate call deduplicates the input values before aggregating, e.g. collapsing repeated categories before concatenating",
+    "correctAnswer": "d",
+    "explanation": "Many aggregate functions accept an optional DISTINCT modifier on their argument, deduplicating values before the aggregate operates on them — useful for e.g. string_agg(DISTINCT tag, ',') to avoid repeated tags in the output."
+  },
+  {
+    "question": "What does the window function frame exclusion clause `EXCLUDE CURRENT ROW` do, e.g. `AVG(x) OVER (ORDER BY y ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW)`?",
+    "a": "It computes the aggregate over the defined frame but leaves out the current row itself, useful for 'compare this row to the average of all others'",
+    "b": "It's a syntax error; EXCLUDE isn't valid in a frame clause",
+    "c": "It excludes the entire partition from the calculation",
+    "d": "It excludes NULL values only",
+    "correctAnswer": "a",
+    "explanation": "Frame exclusion options (EXCLUDE CURRENT ROW / TIES / GROUP / NO OTHERS) let you fine-tune exactly which rows within an otherwise-matching frame are included, here letting you compute something like 'average of everyone else' rather than including the row being evaluated."
+  },
+  {
+    "question": "What does `timestamp_column AT TIME ZONE 'UTC'` do when timestamp_column is of type TIMESTAMP WITHOUT TIME ZONE?",
+    "a": "It has no effect since TIMESTAMP has no time zone",
+    "b": "It interprets the naive timestamp as being in UTC and converts it to a TIMESTAMPTZ value (or vice versa depending on direction), since TIMESTAMP itself carries no time zone information to convert from",
+    "c": "It always returns the current time",
+    "d": "It changes the stored value's time zone metadata",
+    "correctAnswer": "b",
+    "explanation": "AT TIME ZONE on a TIMESTAMP (no zone) treats the naive value as if it were local to the given zone and produces a TIMESTAMPTZ; applied to a TIMESTAMPTZ, it instead converts the instant into the wall-clock time of the given zone as plain TIMESTAMP — the direction of conversion flips depending on the input type, a frequent source of confusion."
+  },
+  {
+    "question": "Why can converting a TIMESTAMPTZ to a specific time zone with AT TIME ZONE around a daylight-saving transition produce results that look 'off by an hour' compared to naive expectations?",
+    "a": "It's always a bug in PostgreSQL's tz database",
+    "b": "PostgreSQL doesn't support daylight saving time at all",
+    "c": "The wall-clock offset for a time zone changes across a DST boundary, so the same underlying instant maps to a different UTC offset depending on which side of the transition it falls, which is correct behavior but easy to misjudge when reasoning about local times",
+    "d": "AT TIME ZONE ignores DST entirely and always uses standard time",
+    "correctAnswer": "c",
+    "explanation": "PostgreSQL uses the IANA time zone database and correctly accounts for DST transitions, but developers manually reasoning about 'add N hours' instead of letting PostgreSQL handle zone-aware arithmetic often get surprised by the non-constant UTC offset around DST boundaries."
+  },
+  {
+    "question": "What is the purpose of `CREATE STATISTICS` (extended statistics) on a combination of columns?",
+    "a": "It creates a new index",
+    "b": "It's only relevant for full-text search",
+    "c": "It tells the planner to track correlation/dependency statistics across multiple columns together (e.g. functional dependencies or multivariate n-distinct counts), improving row-count estimates for queries filtering on several correlated columns at once",
+    "d": "It replaces ANALYZE entirely",
+    "correctAnswer": "c",
+    "explanation": "Default per-column statistics assume columns are independent, which produces bad row estimates when columns are correlated (e.g. city and zip_code); extended statistics (ndistinct, dependencies, or mcv) let ANALYZE record cross-column relationships that the planner can use for more accurate estimates and better plans."
+  },
+  {
+    "question": "What does enabling parallel query execution allow PostgreSQL to do for a large aggregate query?",
+    "a": "Split the work (e.g. scanning and partially aggregating a large table) across multiple background worker processes, combining their partial results in a final step",
+    "b": "Run entirely on a different, replicated server",
+    "c": "Automatically rewrite the SQL to a more efficient form",
+    "d": "Bypass the query planner entirely",
+    "correctAnswer": "a",
+    "explanation": "For sufficiently large scans/aggregates, the planner can choose a parallel plan using multiple worker processes (up to max_parallel_workers_per_gather) that each handle a portion of the data, followed by a Gather/Gather Merge node combining results — transparent to the SQL itself but visible in EXPLAIN plans."
+  },
+  {
+    "question": "Why might a query with a volatile function (e.g. one wrapping random() or now()) in its WHERE clause prevent the planner from choosing certain optimizations like parallel execution or partition pruning?",
+    "a": "Volatile functions have no effect on planning",
+    "b": "The planner cannot assume a volatile function returns a consistent, safely-parallelizable/prunable result across invocations or worker processes, so it must be more conservative about how the query is executed",
+    "c": "Volatile functions are forbidden in WHERE clauses entirely",
+    "d": "It only affects INSERT statements",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL classifies functions as IMMUTABLE, STABLE, or VOLATILE; volatile functions (which can return different results even within the same statement, or have side effects) restrict certain planner optimizations that assume a value is safely reusable or can be evaluated once ahead of time."
+  },
+  {
+    "question": "What does marking a custom SQL function as IMMUTABLE promise to the planner, and what's the risk of mislabeling a function this way?",
+    "a": "It automatically creates an index on the function's result",
+    "b": "It promises the function always returns the same result for the same arguments with no side effects, allowing the planner to cache/reorder/precompute its results (e.g. in expression indexes); mislabeling a function that isn't truly immutable can lead to incorrect cached results and subtle data bugs",
+    "c": "It forces the function to run only once per session",
+    "d": "It has no effect on query planning, purely documentation",
+    "correctAnswer": "b",
+    "explanation": "IMMUTABLE is a promise, not something PostgreSQL verifies — the classic mistake is marking a function IMMUTABLE that actually depends on mutable state (like the current time zone setting) which can then be used in an index and silently produce stale/wrong index entries."
+  },
+  {
+    "question": "What is the purpose of `pg_stat_statements`?",
+    "a": "An extension that tracks execution statistics (call counts, total/average time, rows) aggregated per normalized query text across the whole server, useful for finding the queries consuming the most total time",
+    "b": "It stores full query result caches",
+    "c": "It shows currently locked rows",
+    "d": "It's a built-in feature requiring no extension",
+    "correctAnswer": "a",
+    "explanation": "pg_stat_statements (a contrib extension that must be enabled) is one of the most commonly used tools for performance triage, since it aggregates statistics by normalized query shape (ignoring literal values) across all executions, unlike pg_stat_activity which only shows currently running queries."
+  },
+  {
+    "question": "What is a prepared statement, and what performance benefit can it offer for a query executed many times with different parameter values?",
+    "a": "A materialized view refreshed on a schedule",
+    "b": "A stored procedure written in PL/pgSQL",
+    "c": "A parsed and planned query template (via PREPARE, or transparently via client libraries) that can be re-executed with different parameter values without re-parsing/re-planning the SQL text each time",
+    "d": "A way to pre-warm the buffer cache only",
+    "correctAnswer": "c",
+    "explanation": "Prepared statements let PostgreSQL skip repeated parsing and (depending on generic vs custom plan decisions) planning overhead for a query executed with the same shape but different literal values many times, which matters for high-throughput application code executing the same query repeatedly."
+  },
+  {
+    "question": "What is a potential downside of PostgreSQL switching from a 'custom plan' to a 'generic plan' for a prepared statement after several executions?",
+    "a": "A generic plan is built without knowledge of the specific parameter values, so for some parameter combinations (e.g. a highly skewed WHERE value) it can be significantly worse than a plan tailored to that specific value would have been",
+    "b": "Generic plans disable indexes entirely",
+    "c": "It only affects INSERT statements",
+    "d": "There is never any downside; generic plans are always better",
+    "correctAnswer": "a",
+    "explanation": "PostgreSQL's planner heuristically switches to a generic (parameter-value-agnostic) plan after enough executions show it's not much worse on average, but for columns with skewed data distributions, a generic plan can occasionally perform far worse for particular parameter values than a custom plan that 'knew' the actual value would have chosen."
+  },
+  {
+    "question": "What does logical replication in PostgreSQL replicate, in contrast to physical (streaming) replication?",
+    "a": "Raw WAL bytes representing the entire physical database cluster, identical to streaming replication",
+    "b": "A stream of row-level changes (inserts/updates/deletes) decoded into a logical form, allowing replication of a subset of tables, different PostgreSQL versions, and even to non-identical schemas",
+    "c": "Only DDL changes, never row data",
+    "d": "It requires taking the source database offline for the entire syncing period",
+    "correctAnswer": "b",
+    "explanation": "Logical replication (built on top of logical decoding of the WAL) publishes row-level changes for selected tables via PUBLICATION/SUBSCRIPTION, offering flexibility (partial replication, version differences, filtering) that physical replication — which mirrors the entire binary cluster byte-for-byte — cannot provide."
+  },
+  {
+    "question": "What is the WAL (Write-Ahead Log) primarily responsible for in PostgreSQL?",
+    "a": "Storing query result caches",
+    "b": "Recording every change to the database before it's applied to the actual data files, enabling crash recovery and serving as the basis for both physical and logical replication",
+    "c": "Storing the query planner's statistics",
+    "d": "Logging failed login attempts",
+    "correctAnswer": "b",
+    "explanation": "PostgreSQL follows the write-ahead logging principle: changes are durably recorded in the WAL before the corresponding data pages are modified on disk, so after a crash, WAL records can be replayed to bring the database back to a consistent state — the same log stream also underlies replication."
+  },
+  {
+    "question": "What is a foreign data wrapper (FDW) used for, e.g. postgres_fdw?",
+    "a": "Converting foreign language text encodings",
+    "b": "Encrypting foreign key columns",
+    "c": "Allowing PostgreSQL to query external data sources (like another PostgreSQL database, or even non-PostgreSQL systems) as if they were local tables, via a defined mapping",
+    "d": "Validating foreign key references faster",
+    "correctAnswer": "c",
+    "explanation": "FDWs implement the SQL/MED standard, letting you define a foreign server and foreign tables that transparently proxy queries to another database or data source, useful for federated queries without a full ETL pipeline."
+  },
+  {
+    "question": "What does `pg_dump` produce, and how does it differ fundamentally from a physical backup (e.g. a filesystem snapshot of the data directory)?",
+    "a": "A logical backup: SQL statements (or a custom-format archive) that can recreate the database's schema and data, independent of the physical storage layout — restorable even to a different PostgreSQL version or platform in many cases",
+    "b": "It only backs up table definitions, never data",
+    "c": "A live streaming replica",
+    "d": "An exact byte-for-byte copy of the data directory",
+    "correctAnswer": "a",
+    "explanation": "pg_dump produces a logical representation of the database (DDL + data, via SQL or an internal archive format for pg_restore), which is more portable across versions/platforms than physical backups, though logical dumps of very large databases can take longer to restore since indexes/constraints are typically rebuilt."
+  },
+  {
+    "question": "What can happen if a long-running transaction is left open (idle in transaction) while other transactions continue modifying the same tables?",
+    "a": "It has no effect beyond the connection itself",
+    "b": "It automatically converts to a read-only transaction",
+    "c": "It can hold back autovacuum's ability to clean up dead tuples (since MVCC must preserve versions visible to the old snapshot), leading to table/index bloat, and can also hold locks blocking others",
+    "d": "Nothing; PostgreSQL automatically closes idle transactions",
+    "correctAnswer": "c",
+    "explanation": "An old open transaction's snapshot can force VACUUM to retain dead row versions that would otherwise be reclaimed (since some other transaction might still need to see them), which is why 'idle in transaction' sessions left open for a long time are a well-known operational hazard, alongside any locks they may be holding."
+  },
+  {
+    "question": "What is the general purpose of connection pooling tools like PgBouncer in front of PostgreSQL?",
+    "a": "To encrypt all traffic to the database",
+    "b": "To reuse a smaller number of actual PostgreSQL backend connections across many client connections, since each native PostgreSQL connection is a relatively expensive OS process with its own memory overhead",
+    "c": "To replace the need for indexes",
+    "d": "To automatically shard data across servers",
+    "correctAnswer": "b",
+    "explanation": "Because PostgreSQL uses one OS process per connection (with non-trivial memory/context-switching overhead), high-concurrency applications often front the database with a pooler like PgBouncer that multiplexes many client connections onto a smaller pool of actual server connections."
+  },
+  {
+    "question": "Why can PgBouncer's 'transaction pooling' mode be incompatible with session-level features like prepared statements or advisory locks unless specially handled?",
+    "a": "It only affects read replicas, never the primary",
+    "b": "There's no such incompatibility; all features work identically",
+    "c": "In transaction pooling mode, a client's underlying server connection can change between transactions, so any session-scoped state (prepared statements, SET commands, advisory locks held at session level) tied to one specific server connection can be lost or behave unpredictably on the next transaction",
+    "d": "PgBouncer disables all SQL features except SELECT",
+    "correctAnswer": "c",
+    "explanation": "Transaction pooling reassigns the underlying PostgreSQL connection per transaction (not per client session) for maximum connection reuse, which breaks the assumption that session-scoped state persists — a frequent source of confusing bugs when applications assume a stable one-to-one client-to-backend mapping."
+  },
+  {
+    "question": "What does `INSERT INTO t (id) OVERRIDING SYSTEM VALUE VALUES (100);` allow for a GENERATED ALWAYS AS IDENTITY column?",
+    "a": "It disables the identity behavior for that column permanently",
+    "b": "Nothing; it's invalid syntax for identity columns",
+    "c": "Explicitly inserting a specific value into an identity column that is normally auto-generated and would otherwise reject an explicit value in the strict GENERATED ALWAYS mode",
+    "d": "It resets the sequence to 100",
+    "correctAnswer": "c",
+    "explanation": "GENERATED ALWAYS AS IDENTITY normally rejects an explicitly supplied value for that column; OVERRIDING SYSTEM VALUE is the explicit escape hatch for cases like data migration where you need to insert specific pre-existing IDs anyway."
+  },
+  {
+    "question": "What is the difference between GENERATED ALWAYS AS IDENTITY and GENERATED BY DEFAULT AS IDENTITY?",
+    "a": "ALWAYS rejects an explicitly supplied value (without OVERRIDING SYSTEM VALUE); BY DEFAULT allows an explicit value to be supplied normally, falling back to the sequence-generated value only when none is given",
+    "b": "No difference; they are aliases",
+    "c": "BY DEFAULT disables auto-generation entirely",
+    "d": "ALWAYS only works with bigint columns",
+    "correctAnswer": "a",
+    "explanation": "BY DEFAULT is closer to the old SERIAL behavior (an explicit INSERT value is simply accepted), while ALWAYS is stricter and intended to more firmly guarantee the column's values only ever come from the sequence unless you deliberately override that."
+  },
+  {
+    "question": "Why does a writable CTE like `WITH deleted AS (DELETE FROM orders WHERE status = 'cancelled' RETURNING *) INSERT INTO archive SELECT * FROM deleted;` execute both statements as one atomic unit?",
+    "a": "It doesn't; the two statements run in separate, independent transactions",
+    "b": "It requires wrapping in an explicit BEGIN/COMMIT to be atomic",
+    "c": "Data-modifying CTEs execute within the same single SQL statement/transaction context as the outer query, so the DELETE and the INSERT referencing its RETURNING output happen together atomically",
+    "d": "Only SELECT is allowed inside a WITH clause",
+    "correctAnswer": "c",
+    "explanation": "PostgreSQL allows INSERT/UPDATE/DELETE inside a CTE (with RETURNING), and the entire statement — including any outer query consuming that CTE's output — executes as one atomic unit, a handy pattern for 'move rows from one table to another' without a separate explicit transaction wrapper."
+  }
+]

@@ -3,7 +3,7 @@ export default {
   nav: {
     blog: "Digital garden",
     about: "About me",
-    projects: "Projects"
+    projects: "Projects",
   },
   digitalGarden: {
     definition: "A digital garden is a non-linear collection of evolving notes, ideas, and resources. It is different from a blog in a way that is less organized and can change over time like a garden.",
@@ -30,5 +30,34 @@ export default {
     dyslexicMode: "Dyslexia friendly mode",
     dyslexicModeDisclaimer: "Your preference will be saved to your browser's localstorage so that it will persist even when you change pages. By using the button, you accept this saving method. The website operator does not see this and does not save it in any other way. It is on your own computer.",
     settings: "Settings"
+  },
+  sqlQuiz: {
+    metaTitle: "SQL Quiz | Simon Júlia - Web developer",
+    metaDescription: "Test your PostgreSQL knowledge with a free interactive quiz across beginner, intermediate and expert levels.",
+    heading: "PostgreSQL SQL Quiz",
+    intro: "Pick a difficulty level to start a 15-question quiz on PostgreSQL. Learn the right mental models, keywords and gotchas so you can confidently review a PR with queries.",
+    levelSelect: {
+      heading: "Choose your level",
+      beginnerLabel: "Beginner",
+      beginnerDescription: "Basic SELECT statements, filtering, sorting and simple joins.",
+      intermediateLabel: "Intermediate",
+      intermediateDescription: "Multi-table joins, subqueries, CTEs and aggregations.",
+      expertLabel: "Expert",
+      expertDescription: "Window functions, indexing, locking and lesser-known keywords.",
+      startButton: "Start quiz"
+    },
+    quiz: {
+      progressTemplate: "Question {current} of {total}",
+      correctFeedback: "Correct!",
+      incorrectFeedback: "Incorrect",
+      explanationLabel: "Explanation",
+      nextButton: "Next question"
+    },
+    results: {
+      heading: "Quiz complete",
+      scoreTemplate: "You scored {score} out of {total}",
+      playAgainButton: "Play again",
+      changeLevelButton: "Choose another level"
+    }
   }
 };
