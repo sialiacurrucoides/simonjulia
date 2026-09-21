@@ -2,7 +2,7 @@
 title: "Object storage"
 description: "Storing database backups, serving media files, storing large amounts of training data. Examples of when it is worth considering an object storage integration."
 date: 2026-09-19
-tags: ["backend", "db"]
+tags: ["backend", "db", "DevOps"]
 ---
 
 <figure class="diagram4">

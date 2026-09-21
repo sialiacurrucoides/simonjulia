@@ -2,7 +2,7 @@
 title: "Object storage"
 description: "Adatbázis-másolatok mentése, médiafájlok kiszolgálása, nagy mennyiségű tanító adat tárolása. Példák, amikor érdemes megfontolni egy object storage bekötését."
 date: 2026-09-19
-tags: ["backend", "db"]
+tags: ["backend", "db", "DevOps"]
 ---
 
 <figure class="diagram4">
