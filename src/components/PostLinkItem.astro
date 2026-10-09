@@ -20,6 +20,7 @@ import GrafanaIcon from "../assets/icons/GrafanaIcon.astro";
 import NestjsIcon from "../assets/icons/NestjsIcon.astro";
 import PostgreSQLIcon from "../assets/icons/PostgreSQLIcon.astro";
 import ObjectStorageIcon from "../assets/icons/ObjectStorageIcon.astro";
+import KafkaIcon from "../assets/icons/KafkaIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -45,7 +46,8 @@ const iconList = new Map([
     ["grafana", GrafanaIcon],
     ["nestjs-di", NestjsIcon],
     ["postgre-sql", PostgreSQLIcon],
-    ["object-storage", ObjectStorageIcon]
+    ["object-storage", ObjectStorageIcon],
+    ["background-work", KafkaIcon]
     // Add more mappings as needed
 ]);
 
