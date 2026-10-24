@@ -18,10 +18,69 @@ export default {
     hobbies: "Hobbies: gardening, playing with my dogs, cooking plant based, reading"
   },
   projects: {
-    description: "Some of my first hobby projects when I started working in web development.",
-    persevereDescription: "You can define goals and build up streaks by logging in each day and checking a day (if you worked for it). For testing purposes you can use 'test@gmail.com' with the password 'TestTest2'.",
+    descriptionOld: "I was hesitant to show a project from very first works. However, I still find it cute that I wrote a game just to learn which plastic type is reusable.",
     plastic3matchDescription: "You can only combine and eliminate the recyclable plastic pieces, unless you develop a new technology.",
-    balloonDescription: "Lift up the balloon by correctly discriminating the order of consecutive sounds three times in a row. (Not all the sounds are supported on all machines.)"
+    kasszy: {
+      eyebrow: "Featured project",
+      tagline: "A PWA for everyday household finances: transactions, shopping list and pantry in one place.",
+      cta: "Try Kasszy",
+      newTab: "(opens in a new tab)",
+      imageAlt: "Kasszy login screen with Face ID, Google and email sign-in options",
+      carouselLabel: "Kasszy features",
+      prev: "Previous feature",
+      next: "Next feature",
+      slideLabel: "{current} of {total}",
+      features: {
+        login: {
+          title: "Sign in your way",
+          description: "Log in with Google or with email and password. Two-factor authentication is optional, so you decide how strict it should be."
+        },
+        passkey: {
+          title: "Passkeys",
+          description: "Face ID or fingerprint instead of a password: quicker to use and resistant to phishing."
+        },
+        offline: {
+          title: "Offline shopping list",
+          description: "Once the shopping list has loaded, it stays available in the shop, even without signal."
+        },
+        realtime: {
+          title: "Live knowledge base badge",
+          description: "A badge updates in real time as soon as a new knowledge base article is published."
+        },
+        recurring: {
+          title: "Recurring transactions",
+          description: "Set up repeating bills and subscriptions. A scheduled job sends an in-app reminder the day before they are due."
+        },
+        backup: {
+          title: "Daily backups",
+          description: "Data is backed up automatically every day."
+        },
+        encryption: {
+          title: "Encrypted amounts",
+          description: "Transaction amounts are stored encrypted, so they can't be read as plain numbers in the database."
+        },
+        sharing: {
+          title: "Shared pantry and shopping list",
+          description: "Share the pantry and the shopping list with your household, so everyone sees the same list."
+        },
+        securityAlerts: {
+          title: "Alerts for important moments",
+          description: "You get an email when transactions are exported, two-factor authentication is turned on, or the account is deleted."
+        },
+        export: {
+          title: "Export transactions",
+          description: "Download your transactions and work with them anywhere else."
+        },
+        import: {
+          title: "Import old transactions",
+          description: "Bring over your history from earlier tools, so you don't start from zero."
+        },
+        stats: {
+          title: "Statistics",
+          description: "Several charts and summaries show where the money goes."
+        }
+      }
+    },
   },
   footer: {
     copyright: "- © Júlia Simon 2021 -",

@@ -1,11 +1,7 @@
 ---
 import { Picture } from "astro:assets";
-import Persevere2Desktop from "../assets/projects/persevere2-laptop.png";
-import Persevere2Mobile from "../assets/projects/persevere2-mobile.png";
 import Plastic3matchDesktop from "../assets/projects/plastic3match-laptop.webp";
 import Plastic3matchMobile from "../assets/projects/plastic3match-mobile.png";
-import BalloonLevitatorDesktop from "../assets/projects/balloon-game-laptop.png";
-import BalloonLevitatorMobile from "../assets/projects/balloon-game-mobile.png";
 import { getLang } from "../i18n";
 import GithubIcon from "../assets/icons/GithubIcon.astro";
 import GlobeIcon from "../assets/icons/GlobeIcon.astro";
@@ -13,16 +9,12 @@ import GlobeIcon from "../assets/icons/GlobeIcon.astro";
 const { project } = Astro.props;
 
 const desktopImageList = new Map([
-    ["Persevere2", Persevere2Desktop],
     ["Plastic3match", Plastic3matchDesktop],
-    ["BalloonLevitator", BalloonLevitatorDesktop],
     // Add more mappings as needed
 ]);
 
 const mobileImageList = new Map([
-    ["Persevere2", Persevere2Mobile],
     ["Plastic3match", Plastic3matchMobile],
-    ["BalloonLevitator", BalloonLevitatorMobile],
     // Add more mappings as needed
 ]);
 
@@ -33,9 +25,7 @@ const { lang = "en" } = Astro.params;
 const t = getLang(lang);
 
 const descriptionsList = new Map([
-    ["Persevere2", t.projects.persevereDescription],
     ["Plastic3match", t.projects.plastic3matchDescription],
-    ["BalloonLevitator", t.projects.balloonDescription],
     // Add more mappings as needed
 ]);
 

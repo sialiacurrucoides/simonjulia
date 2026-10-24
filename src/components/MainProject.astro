@@ -1,0 +1,400 @@
+---
+import { Picture } from "astro:assets";
+import { getLang } from "../i18n";
+import type { KasszyFeature } from "../i18n/types";
+import KasszyImage from "../assets/projects/kasszy.png";
+import ShieldCheckIcon from "../assets/icons/ShieldCheckIcon.astro";
+import OTPAuthIcon from "../assets/icons/OTPAuthIcon.astro";
+import WifiOffIcon from "../assets/icons/WifiOffIcon.astro";
+import BellIcon from "../assets/icons/BellIcon.astro";
+import RepeatIcon from "../assets/icons/RepeatIcon.astro";
+import DatabaseBackupIcon from "../assets/icons/DatabaseBackupIcon.astro";
+import LockIcon from "../assets/icons/LockIcon.astro";
+import UsersIcon from "../assets/icons/UsersIcon.astro";
+import MailIcon from "../assets/icons/MailIcon.astro";
+import DownloadIcon from "../assets/icons/DownloadIcon.astro";
+import UploadIcon from "../assets/icons/UploadIcon.astro";
+import ChartIcon from "../assets/icons/ChartIcon.astro";
+
+const KASSZY_URL = "https://app.kasszy.com/login?mode=register";
+
+const { lang = "en" } = Astro.props;
+const t = getLang(lang);
+const k = t.projects.kasszy;
+
+// Order of the carousel slides; copy lives in i18n under projects.kasszy.features
+const features: { key: KasszyFeature; Icon: typeof ShieldCheckIcon }[] = [
+    { key: "login", Icon: ShieldCheckIcon },
+    { key: "passkey", Icon: OTPAuthIcon },
+    { key: "offline", Icon: WifiOffIcon },
+    { key: "realtime", Icon: BellIcon },
+    { key: "recurring", Icon: RepeatIcon },
+    { key: "backup", Icon: DatabaseBackupIcon },
+    { key: "encryption", Icon: LockIcon },
+    { key: "sharing", Icon: UsersIcon },
+    { key: "export", Icon: DownloadIcon },
+    { key: "securityAlerts", Icon: MailIcon },
+    { key: "import", Icon: UploadIcon },
+    { key: "stats", Icon: ChartIcon },
+];
+
+const total = features.length;
+const pad = (n: number) => String(n).padStart(2, "0");
+const slideLabel = (current: number) =>
+    k.slideLabel.replace("{current}", String(current)).replace("{total}", String(total));
+---
+
+<article class="main-project" aria-labelledby="kasszy-title">
+    <header class="mp-header">
+        <p class="eyebrow">{k.eyebrow}</p>
+        <h3 id="kasszy-title">Kasszy</h3>
+        <p class="tagline">{k.tagline}</p>
+        <a class="cta" href={KASSZY_URL} target="_blank" rel="noopener noreferrer">
+            {k.cta}
+            <span aria-hidden="true">↗</span>
+            <span class="visually-hidden">{k.newTab}</span>
+        </a>
+    </header>
+
+    <div class="mp-media">
+        <Picture
+            src={KasszyImage}
+            alt={k.imageAlt}
+            formats={["avif", "webp"]}
+            widths={[360, 560, KasszyImage.width]}
+            sizes="(max-width: 800px) 90vw, 460px"
+            loading="lazy"
+            decoding="async"
+        />
+    </div>
+
+    <div
+        class="mp-features"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={k.carouselLabel}
+    >
+        <div class="track" tabindex="0">
+            {features.map(({ key, Icon }, index) => (
+                <div class="slide" role="group" aria-roledescription="slide" aria-label={slideLabel(index + 1)}>
+                    <span class="feature-icon"><Icon /></span>
+                    <h4>{k.features[key].title}</h4>
+                    <p>{k.features[key].description}</p>
+                </div>
+            ))}
+        </div>
+
+        <div class="controls">
+            <button type="button" class="nav-button prev" aria-label={k.prev} disabled>
+                <span aria-hidden="true">←</span>
+            </button>
+            <p class="counter" aria-live="polite" aria-atomic="true">
+                <span class="current">{pad(1)}</span> / {pad(total)}
+            </p>
+            <div class="progress" aria-hidden="true">
+                <div class="progress-bar"></div>
+            </div>
+            <button type="button" class="nav-button next" aria-label={k.next}>
+                <span aria-hidden="true">→</span>
+            </button>
+        </div>
+    </div>
+</article>
+
+<style>
+    .main-project {
+        --accent: var(--main-bg-color);
+        --accent-strong: var(--main-bg-color);
+        --accent-soft: rgba(137, 159, 201, 0.25);
+
+        display: grid;
+        grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "media header"
+            "media features";
+        column-gap: 3rem;
+        row-gap: 1.5rem;
+        align-items: start;
+        margin: 1rem 0 4rem;
+    }
+
+    .mp-header {
+        grid-area: header;
+    }
+
+    .mp-media {
+        grid-area: media;
+        align-self: center;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #050b0b;
+        box-shadow:
+            0 10px 25px rgba(0, 0, 0, 0.25),
+            0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .mp-media img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .mp-features {
+        grid-area: features;
+        min-width: 0;
+    }
+
+    .eyebrow {
+        color: var(--accent-strong);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .mp-header h3 {
+        font-size: 2.25rem;
+        line-height: 1.2;
+        margin: 0.25rem 0 0.75rem;
+    }
+
+    .tagline {
+        max-width: 38ch;
+        margin-bottom: 1.25rem;
+    }
+
+    .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        border-radius: var(--border-radius);
+        background: var(--main-bg-color);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 150ms ease;
+    }
+
+    .cta:hover {
+        background: var(--main-bg-color-light);
+    }
+
+    .cta:focus-visible,
+    .track:focus-visible,
+    .nav-button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    .track {
+        position: relative;
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        border-radius: 8px;
+    }
+
+    .track::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .track {
+            scroll-behavior: smooth;
+        }
+    }
+
+    .slide {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+        padding: 1.5rem;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 8px;
+    }
+
+    .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+    }
+
+    .feature-icon :global(svg) {
+        width: 1.4rem;
+        height: 1.4rem;
+    }
+
+    .slide h4 {
+        margin: 1rem 0 0.25rem;
+        line-height: 1.4;
+    }
+
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .nav-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--main-bg-color);
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: border-color 150ms ease, color 150ms ease;
+    }
+
+    .nav-button:hover:not(:disabled) {
+        border-color: var(--accent);
+        color: var(--accent-strong);
+    }
+
+    .nav-button:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    .counter {
+        font-variant-numeric: tabular-nums;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .counter .current {
+        color: var(--main-bg-color);
+        font-weight: 700;
+    }
+
+    .progress {
+        flex: 1;
+        height: 3px;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--accent);
+        transform-origin: left;
+        transform: scaleX(0);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .progress-bar {
+            transition: transform 300ms ease-out;
+        }
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    @media (max-width: 800px) {
+        .main-project {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: auto;
+            grid-template-areas:
+                "header"
+                "media"
+                "features";
+        }
+
+        .mp-media {
+            width: 100%;
+            max-width: 420px;
+            justify-self: center;
+        }
+
+        .mp-header h3 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<script>
+    const carousel = document.querySelector<HTMLElement>(".main-project .mp-features");
+
+    if (carousel) {
+        const track = carousel.querySelector<HTMLElement>(".track")!;
+        const slides = Array.from(track.querySelectorAll<HTMLElement>(".slide"));
+        const prev = carousel.querySelector<HTMLButtonElement>(".prev")!;
+        const next = carousel.querySelector<HTMLButtonElement>(".next")!;
+        const current = carousel.querySelector<HTMLElement>(".counter .current")!;
+        const progressBar = carousel.querySelector<HTMLElement>(".progress-bar")!;
+
+        let active = 0;
+
+        const update = (index: number) => {
+            active = index;
+            current.textContent = String(index + 1).padStart(2, "0");
+            progressBar.style.transform = `scaleX(${(index + 1) / slides.length})`;
+            prev.disabled = index === 0;
+            next.disabled = index === slides.length - 1;
+        };
+
+        // scroll-behavior on .track decides smooth vs. instant (reduced motion)
+        const goTo = (index: number) => {
+            const target = Math.max(0, Math.min(index, slides.length - 1));
+            update(target);
+            track.scrollTo({ left: slides[target].offsetLeft });
+        };
+
+        const nearestSlide = () =>
+            slides.reduce((closest, slide, index) =>
+                Math.abs(slide.offsetLeft - track.scrollLeft) <
+                Math.abs(slides[closest].offsetLeft - track.scrollLeft)
+                    ? index
+                    : closest,
+            0);
+
+        // Sync after swipes/trackpad scrolls once the scroll has settled
+        let settleTimer: number | undefined;
+        track.addEventListener(
+            "scroll",
+            () => {
+                window.clearTimeout(settleTimer);
+                settleTimer = window.setTimeout(() => update(nearestSlide()), 100);
+            },
+            { passive: true }
+        );
+
+        prev.addEventListener("click", () => goTo(active - 1));
+        next.addEventListener("click", () => goTo(active + 1));
+
+        track.addEventListener("keydown", (ev) => {
+            if (ev.key === "ArrowRight") {
+                ev.preventDefault();
+                goTo(active + 1);
+            } else if (ev.key === "ArrowLeft") {
+                ev.preventDefault();
+                goTo(active - 1);
+            }
+        });
+
+        update(0);
+    }
+</script>

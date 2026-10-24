@@ -2,6 +2,7 @@
 import { getLang } from "../i18n";
 import { projects } from "../constants/index";
 import ProjectCard from "./ProjectCard.astro";
+import MainProject from "./MainProject.astro";
 
 
 const { lang = "en" } = Astro.props;
@@ -11,7 +12,8 @@ const t = getLang(lang);
 <section id="projects" class="light-theme">
     <div class="inner-container">
         <h2>{t.nav.projects}</h2>
-        <p class="description">{t.projects.description}</p>
+        <MainProject lang={lang} />
+        <p class="description">{t.projects.descriptionOld}</p>
         <div class="container">
             {projects.map((project: unknown) => (
                 <ProjectCard project={project} />

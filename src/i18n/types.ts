@@ -1,3 +1,17 @@
+export type KasszyFeature =
+  | "login"
+  | "passkey"
+  | "offline"
+  | "realtime"
+  | "recurring"
+  | "backup"
+  | "encryption"
+  | "sharing"
+  | "securityAlerts"
+  | "export"
+  | "import"
+  | "stats";
+
 export type Translation = {
   metaDescription: string;
   nav: {
@@ -19,10 +33,20 @@ export type Translation = {
     hobbies: string;
   };
   projects: {
-    description: string;
-    persevereDescription: string;
+    descriptionOld: string;
     plastic3matchDescription: string;
-    balloonDescription: string;
+    kasszy: {
+      eyebrow: string;
+      tagline: string;
+      cta: string;
+      newTab: string;
+      imageAlt: string;
+      carouselLabel: string;
+      prev: string;
+      next: string;
+      slideLabel: string;
+      features: Record<KasszyFeature, { title: string; description: string }>;
+    };
   };
   footer: {
     copyright: string;
