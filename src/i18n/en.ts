@@ -18,7 +18,7 @@ export default {
     hobbies: "Hobbies: gardening, playing with my dogs, cooking plant based, reading"
   },
   projects: {
-    descriptionOld: "I was hesitant to show a project from very first works. However, I still find it cute that I wrote a game just to learn which plastic type is reusable.",
+    descriptionOld: "I was torn about whether to show anything from my very first attempts, but I just thought it was cute that I wrote a game that taught me which types of plastic can be recycled.",
     plastic3matchDescription: "You can only combine and eliminate the recyclable plastic pieces, unless you develop a new technology.",
     kasszy: {
       eyebrow: "Featured project",
