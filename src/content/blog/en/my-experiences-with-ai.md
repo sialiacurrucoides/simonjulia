@@ -16,7 +16,7 @@ tags: ["backend", "frontend", "DevOps", "security"]
 By 2025, AI-assisted work was already in full swing, but I was still only using two tools.
 
 - ChatGPT — I asked it for help when I needed a solution I hadn't used before, or used it to speed up smaller tasks, such as designing regex patterns. I added the final solution to the codebase myself.
-- Copilot — sometimes for autocomplete, or for smaller tasks like summarising an error and suggesting a fix. I wasn't impressed. Once, it had been working for almost half an hour without finding the right approach. When I took over, I had it sorted in ten minutes. At that point, I still found it hard to imagine AI taking developers' jobs.
+- Copilot — sometimes for autocomplete, or for smaller tasks like summarizing an error and suggesting a fix. I wasn't impressed. Once, it had been working for almost half an hour without finding the right approach. When I took over, I had it sorted in ten minutes. At that point, I still found it hard to imagine AI taking developers' jobs.
 
 <br>
 
@@ -35,7 +35,7 @@ Here's how I started:
   - "NEVER commit directly to [master/main/prod - fill which is relevant]"
 - Install the __Context7 MCP__ server so it could retrieve up-to-date information about various tools and packages.
 - Copy a few popular skills into the skills folder for relevant topics: accessibility, web-security, modern-tailwind, and so on. It's best not to go overboard collecting skills, because even their names and descriptions take up space in the context window. The backend codebase didn't have access to the frontend-specific skills.
-- Run `/clear` after every task to optimise token usage and reduce the chance of hallucinations.
+- Run `/clear` after every task to optimize token usage and reduce the chance of hallucinations.
 - Send every prompt in plan mode.
 
 <br>
@@ -46,7 +46,7 @@ At first, I was really paranoid about security, worried it might do something it
 
 ## The honeymoon phase
 
-After that sceptical start, when I still thought I had to tell it how to do everything, I quickly realised that if I clearly specified the goal, it could come up with an even better plan than mine. I was honestly impressed by how many edge cases it identified, all the things it wrote tests for, and the questions it asked me. I got carried away, and soon it was writing most of the code.
+After that skeptical start, when I still thought I had to tell it how to do everything, I quickly realized that if I clearly specified the goal, it could come up with an even better plan than mine. I was honestly impressed by how many edge cases it identified, all the things it wrote tests for, and the questions it asked me. I got carried away, and soon it was writing most of the code.
 
 <br>
 

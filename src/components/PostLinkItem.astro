@@ -22,6 +22,7 @@ import PostgreSQLIcon from "../assets/icons/PostgreSQLIcon.astro";
 import ObjectStorageIcon from "../assets/icons/ObjectStorageIcon.astro";
 import KafkaIcon from "../assets/icons/KafkaIcon.astro";
 import AIIcon from "../assets/icons/AIIcon.astro";
+import MCPIcon from "../assets/icons/MCPIcon.astro";
 
 const { title, date, slug, lang } = Astro.props;
 const formattedDate = new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -49,7 +50,8 @@ const iconList = new Map([
     ["postgre-sql", PostgreSQLIcon],
     ["object-storage", ObjectStorageIcon],
     ["background-work", KafkaIcon],
-    ["my-experiences-with-ai", AIIcon]
+    ["my-experiences-with-ai", AIIcon],
+    ["mcp-server", MCPIcon]
     // Add more mappings as needed
 ]);
 
